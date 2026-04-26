@@ -1,6 +1,9 @@
 package com.mikey.ecommerce.order;
 
 import com.mikey.ecommerce.common.ApiException;
+import com.mikey.ecommerce.dto.order.OrderResponse;
+import com.mikey.ecommerce.mapper.OrderMapper;
+import com.mikey.ecommerce.mapper.PaymentMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +24,23 @@ public class OrderController {
     }
 
     @GetMapping
-    public List<CustomerOrder> findAll() {
-        return orderRepository.findAll();
+    public List<OrderResponse> findAll() {
+
+        return orderRepository.findAll()
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public CustomerOrder findById(@PathVariable("id") Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new ApiException("Order not found"));
+    public OrderResponse findById(@PathVariable("id") Long id) {
+        return OrderMapper.toResponse(
+                orderRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Order not found")));
     }
 
     @PostMapping
-    public CustomerOrder create(@Valid @RequestBody CreateOrderRequest request) {
-        return orderService.createOrder(request);
+    public OrderResponse create(@Valid @RequestBody CreateOrderRequest request) {
+        return OrderMapper.toResponse(orderService.createOrder(request));
     }
 }

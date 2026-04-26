@@ -1,5 +1,8 @@
 package com.mikey.ecommerce.payment;
 
+import com.mikey.ecommerce.dto.payment.PaymentResponse;
+import com.mikey.ecommerce.mapper.InventoryMapper;
+import com.mikey.ecommerce.mapper.PaymentMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +23,15 @@ public class PaymentController {
     }
 
     @GetMapping
-    public List<Payment> findAll() {
-        return paymentRepository.findAll();
+    public List<PaymentResponse> findAll() {
+        return paymentRepository.findAll()
+                .stream()
+                .map(PaymentMapper::toResponse)
+                .toList();
     }
 
     @PostMapping
-    public Payment pay(@Valid @RequestBody PaymentRequest request) {
-        return paymentService.processPayment(request);
+    public PaymentResponse pay(@Valid @RequestBody PaymentRequest request) {
+        return PaymentMapper.toResponse(paymentService.processPayment(request));
     }
 }
