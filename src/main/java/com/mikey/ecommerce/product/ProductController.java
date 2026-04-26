@@ -76,10 +76,11 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public Product update(@PathVariable("id") Long id, @Valid @RequestBody ProductRequest request) {
+    public ProductResponse update(@PathVariable("id") Long id, @Valid @RequestBody ProductRequest request) {
         Product product = retrieveProduct(id);
         product.update(request.name(), request.description(), request.price());
-        return productRepository.save(product);
+        return ProductMapper.toResponse(
+                productRepository.save(product));
     }
 
     @DeleteMapping("/{id}")
