@@ -1,6 +1,7 @@
 package com.mikey.ecommerce.product;
 
 import com.mikey.ecommerce.common.ApiException;
+import com.mikey.ecommerce.dto.product.ProductSummaryResponse;
 import com.mikey.ecommerce.inventory.Inventory;
 import com.mikey.ecommerce.inventory.InventoryRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,7 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
+import com.mikey.ecommerce.dto.product.ProductResponse;
+import com.mikey.ecommerce.mapper.ProductMapper;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public List<ProductSummaryResponse> findAll() {
+
+        return productRepository.findAll()
+                .stream()
+                .map(ProductMapper::toSummary)
+                .toList();
     }
 
     @Operation(
@@ -50,12 +56,14 @@ public class ProductController {
             )
     })
     @GetMapping("/{id}")
-    public Product findById(
+    public ProductResponse findById(
             @Parameter(description = "The ID of the product to retrieve", example = "101")
             @PathVariable("id") Long id
     ) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new ApiException("Product not found"));
+        return ProductMapper.toResponse(
+                productRepository.findById(id)
+                        .orElseThrow(() -> new ApiException("Product not found")));
+
     }
 
 
@@ -69,7 +77,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public Product update(@PathVariable("id") Long id, @Valid @RequestBody ProductRequest request) {
-        Product product = findById(id);
+        Product product = retrieveProduct(id);
         product.update(request.name(), request.description(), request.price());
         return productRepository.save(product);
     }
@@ -77,5 +85,12 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
         productRepository.deleteById(id);
+    }
+
+
+    private Product retrieveProduct(Long productId ) {
+        return productRepository.findById(productId)
+                        .orElseThrow(() -> new ApiException("Product not found"));
+
     }
 }
