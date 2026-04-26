@@ -66,13 +66,12 @@ public class ProductController {
 
     }
 
-
     @PostMapping
-    public Product create(@Valid @RequestBody ProductRequest request) {
+    public ProductResponse create(@Valid @RequestBody ProductRequest request) {
         Product product = productRepository.save(new Product(request.name(), request.description(), request.price()));
         int initialStock = request.initialStock() == null ? 0 : request.initialStock();
         inventoryRepository.save(new Inventory(product, initialStock));
-        return product;
+        return ProductMapper.toResponse(product);
     }
 
     @PutMapping("/{id}")
