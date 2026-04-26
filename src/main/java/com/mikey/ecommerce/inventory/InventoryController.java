@@ -40,14 +40,16 @@ public class InventoryController {
     }
 
     @PatchMapping("/{productId}/stock")
-    public InventoryResponse  addStock(@PathVariable("productId") Long productId, @Valid @RequestBody StockRequest request) {
-        Inventory inventory = retrieveInventory(productId);
-        inventory.addStock(request.quantity());
-        return InventoryMapper.toResponse(
-                inventoryRepository.save(inventory));
-    }
+    public InventoryResponse addStock(
+            @PathVariable("productId") Long productId,
+            @Valid @RequestBody StockRequest request) {
 
-    private Inventory retrieveInventory(@PathVariable("inventoryId") Long inventoryId) {
-        return inventoryRepository.findByProductId(inventoryId).orElseThrow(() -> new ApiException("Inventory not found"));
+        Inventory inventory = inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new ApiException("Inventory not found for product"));
+
+        inventory.addStock(request.quantity());
+        Inventory savedInventory = inventoryRepository.save(inventory);
+
+        return InventoryMapper.toResponse(savedInventory);
     }
 }

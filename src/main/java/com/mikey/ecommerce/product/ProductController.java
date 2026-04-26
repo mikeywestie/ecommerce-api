@@ -76,22 +76,21 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ProductResponse update(@PathVariable("id") Long id, @Valid @RequestBody ProductRequest request) {
-        Product product = retrieveProduct(id);
+    public ProductResponse update(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody ProductRequest request) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Product not found"));
+
         product.update(request.name(), request.description(), request.price());
-        return ProductMapper.toResponse(
-                productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+
+        return ProductMapper.toResponse(savedProduct);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
         productRepository.deleteById(id);
-    }
-
-
-    private Product retrieveProduct(Long productId ) {
-        return productRepository.findById(productId)
-                        .orElseThrow(() -> new ApiException("Product not found"));
-
     }
 }
