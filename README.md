@@ -1,253 +1,105 @@
 # E-Commerce RESTful API
 
-Java 21 + Spring Boot 3 + PostgreSQL + Spring Boot + Swagger/OpenAPI
+Java 21 + Spring Boot 3 + PostgreSQL + Swagger/OpenAPI
 
-Backend e-commerce platform demonstrating REST API design, inventory management, ordering workflows, DTO-based API contracts, pagination/filtering, and production-style backend practices.
+Backend e-commerce platform showcasing production-style API development, data integrity, testing, and concurrency controls.
 
 ---
 
-## Current Release
+# Current Release
 
-**Version:** `v1.1 API Hardening`
+**Latest Release:** `v1.2.0 Database & Quality`
 
-### Completed Milestones
+## Completed Releases
 - ✅ v1.0 Core REST API
 - ✅ v1.1 API Hardening
-- 🚧 v1.2 Database & Quality (Next)
+- ✅ v1.2 Database & Quality
+
+## Next Release
+- 🚧 v1.3 Security
 
 ---
 
-## Features
+# Features
 
-### Core Commerce
+## Core Commerce
 - Product management
 - Inventory stock tracking
-- Order creation
-- Stock reservation during order creation
+- Order creation workflow
 - Payment processing simulation
-- Order lifecycle handling
 
-### API Hardening (v1.1)
-- DTO-based API responses
-- Pagination support
-- Sorting support
-- Product search filtering
-- Price range filtering
-- Request validation
-- Custom API exception handling
+## API Hardening
+- DTO-based responses
+- Pagination, sorting, filtering
+- Validation and exception handling
 
-### Platform
+## Database & Quality
+- Flyway migrations
+- Integration testing
+- Entity auditing
+- Optimistic locking for inventory concurrency
+
+## Platform
 - PostgreSQL in Docker
-- Swagger/OpenAPI documentation
+- Swagger/OpenAPI
+- Java 21 records
 - Layered architecture
-- Java 21 records for DTOs
 
 ---
 
-## Tech Stack
-
-- Java 21
-- Spring Boot 3
-- Spring Data JPA
-- PostgreSQL
-- Docker Compose
-- Maven
-- Swagger / OpenAPI
-
----
-
-## Requirements
-
-- Java 21
-- Maven
-- Docker Desktop
-
----
-
-# Getting Started
-
-## Start PostgreSQL
-
-```bash
-docker compose up -d
-```
-
-## Run API
-
-```bash
-mvn spring-boot:run
-```
-
----
-
-## Swagger UI
-
-Open:
-
-```text
-http://localhost:8080/swagger-ui/index.html
-```
-
----
-
-# API Endpoints
-
-## Products
-```http
-GET    /api/products
-GET    /api/products/{id}
-POST   /api/products
-PUT    /api/products/{id}
-DELETE /api/products/{id}
-```
-
-### Product Query Features
-```http
-GET /api/products?page=0&size=10
-GET /api/products?sortBy=price&sortDir=desc
-GET /api/products?search=laptop
-GET /api/products?minPrice=500&maxPrice=5000
-```
-
----
-
-## Inventory
-```http
-GET    /api/inventory
-PATCH  /api/inventory/{productId}/stock
-```
-
----
-
-## Orders
-```http
-POST   /api/orders
-GET    /api/orders
-GET    /api/orders/{id}
-```
-
----
-
-## Payments
-```http
-POST   /api/payments
-GET    /api/payments
-```
-
----
-
-# Example Requests
-
-## Create Order
-
-```json
-{
-  "customerName": "Michael",
-  "customerEmail": "michael@example.com",
-  "items": [
-    {
-      "productId": 1,
-      "quantity": 2
-    }
-  ]
-}
-```
-
----
-
-## Process Payment
-
-```json
-{
-  "orderId": 1,
-  "paymentMethod": "CARD"
-}
-```
-
----
-
-# Pagination Response Example
-
-```json
-{
-  "content": [
-    {
-      "id": 1,
-      "name": "Laptop",
-      "price": 15000
-    }
-  ],
-  "page": 0,
-  "size": 10,
-  "totalElements": 25,
-  "totalPages": 3,
-  "last": false
-}
-```
-
----
-
-# Project Roadmap
+# Roadmap
 
 ## Completed
 - [x] DTO Refactor
-- [x] Pagination / Sorting / Filtering
+- [x] Product Pagination / Filtering
+- [x] Flyway Database Migrations
+- [x] Integration Tests
+- [x] Auditing Support
+- [x] Optimistic Locking
 
-## Next (v1.2)
-- [ ] Flyway migrations
-- [ ] Integration tests with Testcontainers
-- [ ] Auditing and optimistic locking
-
-## Planned
+## In Progress (Upcoming)
+### v1.3 Security
 - [ ] JWT Authentication
-- [ ] Dockerized application container
+- [ ] Role-Based Authorization (ADMIN / CUSTOMER)
+
+## Planned Later
 - [ ] Kafka event-driven workflows
+- [ ] Dockerized application container
+- [ ] CI/CD pipeline
+- [ ] Monitoring and observability
 
 ---
 
-# Architecture (Current)
+# Architecture Highlights
+
+Current project includes:
+
 ```text
-Controller
-  ↓
-Service
-  ↓
-Repository
-  ↓
-PostgreSQL
+REST APIs
+DTO Mapping
+Repository Pattern
+Flyway Migrations
+Integration Testing
+Concurrency Protection
 ```
 
-Modules:
+---
+
+# Version Timeline
+
 ```text
-Product
-Inventory
-Orders
-Payments
+v1.0 Core REST API        ✅
+v1.1 API Hardening        ✅
+v1.2 Database & Quality   ✅
+v1.3 Security             Next
 ```
 
 ---
 
-## Running Tests
+## Upcoming Security Features
+Planned with :contentReference[oaicite:0]{index=0}
 
-```bash
-mvn test
-```
-
----
-
-## Future Enhancements
-Planned evolution toward:
-
-- Security with JWT
-- Event-driven microservices
-- Kafka integration
-- CI/CD pipeline
-- Observability and monitoring
-
----
-
-## Author
-
-Built by Michael Westman
-
-GitHub:
-https://github.com/mikeywestie/ecommerce-api
+- JWT login
+- Token validation
+- ADMIN / CUSTOMER roles
+- Protected endpoints
