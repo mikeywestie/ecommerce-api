@@ -6,6 +6,8 @@ import com.mikey.ecommerce.cart.dto.CartResponse;
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.coupon.Coupon;
 import com.mikey.ecommerce.coupon.CouponRepository;
+import com.mikey.ecommerce.events.OrderCreatedEvent;
+import com.mikey.ecommerce.events.OrderEventProducer;
 import com.mikey.ecommerce.product.Product;
 import com.mikey.ecommerce.product.ProductRepository;
 import com.mikey.ecommerce.security.AppUser;
@@ -31,18 +33,22 @@ public class CartService {
     private final AppUserRepository appUserRepository;
     private final OrderService orderService;
     private final CouponRepository couponRepository;
+    private final OrderEventProducer orderEventProducer;
 
     public CartService(
             CartRepository cartRepository,
             ProductRepository productRepository,
             AppUserRepository appUserRepository,
-            OrderService orderService, CouponRepository couponRepository
+            OrderService orderService,
+            CouponRepository couponRepository,
+            OrderEventProducer orderEventProducer
     ) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.appUserRepository = appUserRepository;
         this.orderService = orderService;
         this.couponRepository = couponRepository;
+        this.orderEventProducer = orderEventProducer;
     }
 
     public CartResponse getCart(String userEmail) {
@@ -239,6 +245,14 @@ public class CartService {
             );
         }
 
+        orderEventProducer.publish(
+                new OrderCreatedEvent(
+                        order.getId(),
+                        order.getCustomerEmail(),
+                        order.getTotalAmount(),
+                        order.getCreatedAt()
+                )
+        );
 
         // Clear cart after successful checkout
         cart.clear();
