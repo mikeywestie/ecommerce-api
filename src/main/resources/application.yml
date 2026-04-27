@@ -33,3 +33,7 @@ management:
     web:
       exposure:
         include: health,info
+
+jwt:
+  secret: "change-this-secret-key-to-something-long-and-secure-for-dev-only"
+  expiration-ms: 86400000
