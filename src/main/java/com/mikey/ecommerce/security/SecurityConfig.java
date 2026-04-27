@@ -2,6 +2,7 @@ package com.mikey.ecommerce.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,13 +38,18 @@ public class SecurityConfig {
                                 "/actuator/info"
                         ).permitAll()
 
-                        // Public product browsing
-                        .requestMatchers(
-                                "/api/products",
-                                "/api/products/**"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
-                        // Everything else requires a valid JWT
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/inventory/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/payments/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

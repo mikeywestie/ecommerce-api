@@ -1,0 +1,140 @@
+package com.mikey.ecommerce.cart;
+
+import com.mikey.ecommerce.cart.dto.AddCartItemRequest;
+import com.mikey.ecommerce.cart.dto.CartItemResponse;
+import com.mikey.ecommerce.cart.dto.CartResponse;
+import com.mikey.ecommerce.common.ApiException;
+import com.mikey.ecommerce.product.Product;
+import com.mikey.ecommerce.product.ProductRepository;
+import com.mikey.ecommerce.security.AppUser;
+import com.mikey.ecommerce.security.AppUserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+@Transactional
+public class CartService {
+
+    private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
+    private final AppUserRepository appUserRepository;
+
+    public CartService(
+            CartRepository cartRepository,
+            ProductRepository productRepository,
+            AppUserRepository appUserRepository
+    ) {
+        this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
+        this.appUserRepository = appUserRepository;
+    }
+
+    public CartResponse getCart(String userEmail) {
+
+        AppUser user = findUser(userEmail);
+
+        Cart cart = cartRepository
+                .findByUser(user)
+                .orElseGet(() ->
+                        cartRepository.save(
+                                new Cart(user)
+                        )
+                );
+
+        return toResponse(cart);
+    }
+
+    public CartResponse addItem(
+            String userEmail,
+            AddCartItemRequest request
+    ) {
+
+        AppUser user = findUser(userEmail);
+
+        Product product = productRepository
+                .findById(request.productId())
+                .orElseThrow(() ->
+                        new ApiException("Product not found")
+                );
+
+        Cart cart = cartRepository
+                .findByUser(user)
+                .orElseGet(() ->
+                        cartRepository.save(
+                                new Cart(user)
+                        )
+                );
+
+        CartItem existingItem = cart.getItems()
+                .stream()
+                .filter(i ->
+                        i.getProduct()
+                                .getId()
+                                .equals(request.productId())
+                )
+                .findFirst()
+                .orElse(null);
+
+        if (existingItem != null) {
+            existingItem.updateQuantity(
+                    existingItem.getQuantity()
+                            + request.quantity()
+            );
+        } else {
+            cart.addItem(
+                    new CartItem(
+                            cart,
+                            product,
+                            request.quantity()
+                    )
+            );
+        }
+
+        Cart saved = cartRepository.save(cart);
+
+        return toResponse(saved);
+    }
+
+    private AppUser findUser(String email) {
+        return appUserRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new ApiException("User not found")
+                );
+    }
+
+    private CartResponse toResponse(Cart cart) {
+
+        List<CartItemResponse> items =
+                cart.getItems()
+                        .stream()
+                        .map(item ->
+                                new CartItemResponse(
+                                        item.getId(),
+                                        item.getProduct().getId(),
+                                        item.getProduct().getName(),
+                                        item.getQuantity(),
+                                        item.getProduct().getPrice(),
+                                        item.getLineTotal()
+                                )
+                        )
+                        .toList();
+
+        BigDecimal total =
+                items.stream()
+                        .map(CartItemResponse::lineTotal)
+                        .reduce(
+                                BigDecimal.ZERO,
+                                BigDecimal::add
+                        );
+
+        return new CartResponse(
+                cart.getId(),
+                items,
+                total
+        );
+    }
+}
