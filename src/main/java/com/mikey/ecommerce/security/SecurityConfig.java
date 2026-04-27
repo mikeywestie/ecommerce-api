@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -46,14 +47,29 @@ public class SecurityConfig {
                                 "/actuator/info"
                         ).permitAll()
 
-                        // Public product browsing
-                        .requestMatchers(
-                                "/api/products",
-                                "/api/products/**"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**")
+                        .permitAll()
 
-                        // Everything else requires a valid JWT
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/products")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/api/inventory/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/api/orders/**")
+                        .hasAnyRole("CUSTOMER", "ADMIN")
+
+                        .requestMatchers("/api/payments/**")
+                        .hasAnyRole("CUSTOMER", "ADMIN")
+
+                        .anyRequest()
+                        .authenticated()
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
