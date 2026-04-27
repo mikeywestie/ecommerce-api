@@ -1,6 +1,8 @@
 package com.mikey.ecommerce.payment;
 
 import com.mikey.ecommerce.common.ApiException;
+import com.mikey.ecommerce.events.OrderEventProducer;
+import com.mikey.ecommerce.events.PaymentProcessedEvent;
 import com.mikey.ecommerce.order.CustomerOrder;
 import com.mikey.ecommerce.order.OrderRepository;
 import com.mikey.ecommerce.order.OrderStatus;
@@ -12,10 +14,12 @@ public class PaymentService {
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
+    private final OrderEventProducer orderEventProducer;
 
-    public PaymentService(OrderRepository orderRepository, PaymentRepository paymentRepository) {
+    public PaymentService(OrderRepository orderRepository, PaymentRepository paymentRepository, OrderEventProducer orderEventProducer) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
+        this.orderEventProducer = orderEventProducer;
     }
 
     @Transactional
@@ -46,6 +50,19 @@ public class PaymentService {
                 order.getTotalAmount()
         );
 
-        return paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        orderEventProducer.publish(
+                new PaymentProcessedEvent(
+                        savedPayment.getId(),
+                        savedPayment.getOrder().getId(),
+                        savedPayment.getPaymentMethod(),
+                        savedPayment.getStatus().name(),
+                        savedPayment.getAmount(),
+                        savedPayment.getPaidAt()
+                )
+        );
+
+        return savedPayment;
     }
 }
