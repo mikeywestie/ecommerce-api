@@ -18,4 +18,16 @@ public class OrderEventConsumer {
                 "EVENT RECEIVED -> " + event
         );
     }
+
+    @KafkaListener(
+            topics = "payment-processed",
+            groupId = "ecommerce-group"
+    )
+    public void consumePaymentProcessed(
+            PaymentProcessedEvent event
+    ) {
+        System.out.println(
+                "PAYMENT EVENT RECEIVED -> " + event
+        );
+    }
 }

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderEventProducer {
 
-    private static final String TOPIC =
-            "order-created";
+    private static final String TOPIC = "order-created";
+    private static final String PAYMENT_PROCESSED_TOPIC = "payment-processed";
 
     private final KafkaTemplate<String,Object> kafkaTemplate;
 
@@ -15,6 +15,14 @@ public class OrderEventProducer {
             KafkaTemplate<String,Object> kafkaTemplate
     ) {
         this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void publish(PaymentProcessedEvent event) {
+        kafkaTemplate.send(
+                PAYMENT_PROCESSED_TOPIC,
+                event.orderId().toString(),
+                event
+        );
     }
 
     public void publish(
