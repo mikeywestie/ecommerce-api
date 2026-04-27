@@ -39,6 +39,12 @@ public class CustomerOrder {
     )
     private List<OrderItem> items = new ArrayList<>();
 
+    @Column(name = "coupon_code")
+    private String couponCode;
+
+    @Column(name = "discount_amount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
     protected CustomerOrder() {}
 
     public CustomerOrder(String customerName, String customerEmail) {
@@ -53,6 +59,8 @@ public class CustomerOrder {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public Instant getCreatedAt() { return createdAt; }
     public List<OrderItem> getItems() { return items; }
+    public String getCouponCode() { return couponCode; }
+    public BigDecimal getDiscountAmount() { return discountAmount; }
 
     public void addItem(OrderItem item) {
         this.items.add(item);
@@ -65,5 +73,15 @@ public class CustomerOrder {
 
     public void markPaymentFailed() {
         this.status = OrderStatus.PAYMENT_FAILED;
+    }
+
+    public void applyDiscount(String couponCode, BigDecimal discountAmount) {
+        this.couponCode = couponCode;
+        this.discountAmount = discountAmount;
+        this.totalAmount = this.totalAmount.subtract(discountAmount);
+
+        if (this.totalAmount.signum() < 0) {
+            this.totalAmount = BigDecimal.ZERO;
+        }
     }
 }
