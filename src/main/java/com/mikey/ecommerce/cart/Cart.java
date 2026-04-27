@@ -1,5 +1,6 @@
 package com.mikey.ecommerce.cart;
 
+import com.mikey.ecommerce.coupon.Coupon;
 import com.mikey.ecommerce.security.AppUser;
 import jakarta.persistence.*;
 
@@ -24,6 +25,10 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
 
     protected Cart() {
     }
@@ -54,5 +59,13 @@ public class Cart {
 
     public void clear() {
         this.items.clear();
+    }
+
+    public Coupon getCoupon() {
+        return coupon;
+    }
+
+    public void applyCoupon(Coupon coupon) {
+        this.coupon = coupon;
     }
 }

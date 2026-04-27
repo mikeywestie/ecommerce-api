@@ -43,4 +43,15 @@ public class CartController {
     public OrderResponse checkout(Authentication authentication) {
         return cartService.checkout(authentication.getName());
     }
+
+    @PostMapping("/apply-coupon/{code}")
+    public CartResponse applyCoupon(
+            Authentication authentication,
+            @PathVariable String code
+    ) {
+        return cartService.applyCoupon(
+                authentication.getName(),
+                code
+        );
+    }
 }

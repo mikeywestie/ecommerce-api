@@ -24,6 +24,8 @@ public class OrderMapper {
                 order.getCustomerEmail(),
                 order.getStatus().name(),
                 order.getTotalAmount(),
+                order.getCouponCode(),
+                order.getDiscountAmount(),
                 order.getCreatedAt(),
                 items
         );
