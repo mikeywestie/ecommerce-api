@@ -20,6 +20,7 @@ import com.mikey.ecommerce.order.OrderItemRequest;
 import com.mikey.ecommerce.dto.order.OrderResponse;
 import com.mikey.ecommerce.mapper.OrderMapper;
 import com.mikey.ecommerce.order.OrderService;
+import com.mikey.ecommerce.events.CouponAppliedEvent;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -242,6 +243,15 @@ public class CartService {
             order.applyDiscount(
                     cart.getCoupon().getCode(),
                     discount
+            );
+
+            orderEventProducer.publish(
+                    new CouponAppliedEvent(
+                            order.getId(),
+                            cart.getCoupon().getCode(),
+                            discount,
+                            java.time.Instant.now()
+                    )
             );
         }
 

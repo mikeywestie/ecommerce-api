@@ -30,4 +30,16 @@ public class OrderEventConsumer {
                 "PAYMENT EVENT RECEIVED -> " + event
         );
     }
+
+    @KafkaListener(
+            topics = "coupon-applied",
+            groupId = "ecommerce-group"
+    )
+    public void consumeCouponApplied(
+            CouponAppliedEvent event
+    ) {
+        System.out.println(
+                "COUPON EVENT RECEIVED -> " + event
+        );
+    }
 }
