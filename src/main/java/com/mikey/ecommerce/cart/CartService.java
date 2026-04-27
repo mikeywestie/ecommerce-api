@@ -10,6 +10,12 @@ import com.mikey.ecommerce.security.AppUser;
 import com.mikey.ecommerce.security.AppUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.mikey.ecommerce.order.CreateOrderRequest;
+import com.mikey.ecommerce.order.CustomerOrder;
+import com.mikey.ecommerce.order.OrderItemRequest;
+import com.mikey.ecommerce.dto.order.OrderResponse;
+import com.mikey.ecommerce.mapper.OrderMapper;
+import com.mikey.ecommerce.order.OrderService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,15 +27,18 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final AppUserRepository appUserRepository;
+    private final OrderService orderService;
 
     public CartService(
             CartRepository cartRepository,
             ProductRepository productRepository,
-            AppUserRepository appUserRepository
+            AppUserRepository appUserRepository,
+            OrderService orderService
     ) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.appUserRepository = appUserRepository;
+        this.orderService = orderService;
     }
 
     public CartResponse getCart(String userEmail) {
@@ -136,5 +145,37 @@ public class CartService {
                 items,
                 total
         );
+    }
+
+    public OrderResponse checkout(String userEmail) {
+        AppUser user = findUser(userEmail);
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new ApiException("Cart not found"));
+
+        if (cart.getItems().isEmpty()) {
+            throw new ApiException("Cart is empty");
+        }
+
+        List<OrderItemRequest> orderItems = cart.getItems()
+                .stream()
+                .map(item -> new OrderItemRequest(
+                        item.getProduct().getId(),
+                        item.getQuantity()
+                ))
+                .toList();
+
+        CreateOrderRequest orderRequest = new CreateOrderRequest(
+                user.getName(),
+                user.getEmail(),
+                orderItems
+        );
+
+        CustomerOrder order = orderService.createOrder(orderRequest);
+
+        cart.clear();
+        cartRepository.save(cart);
+
+        return OrderMapper.toResponse(order);
     }
 }

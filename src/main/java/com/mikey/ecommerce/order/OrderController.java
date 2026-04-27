@@ -25,8 +25,7 @@ public class OrderController {
 
     @GetMapping
     public List<OrderResponse> findAll() {
-
-        return orderRepository.findAll()
+        return orderRepository.findAllWithItems()
                 .stream()
                 .map(OrderMapper::toResponse)
                 .toList();
@@ -34,9 +33,9 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public OrderResponse findById(@PathVariable("id") Long id) {
-        return OrderMapper.toResponse(
-                orderRepository.findById(id)
-                .orElseThrow(() -> new ApiException("Order not found")));
+        return orderRepository.findByIdWithItems(id)
+                .map(OrderMapper::toResponse)
+                .orElseThrow(() -> new ApiException("Order not found"));
     }
 
     @PostMapping
