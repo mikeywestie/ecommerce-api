@@ -1,16 +1,16 @@
 # E-Commerce RESTful API
 
-Java 21 + Spring Boot 3 + PostgreSQL + Swagger/OpenAPI
+Java 21 + Spring Boot 3 + PostgreSQL + Kafka + Swagger/OpenAPI
 
-Production-style backend e-commerce platform showcasing modern API development, database reliability, security, testing, and concurrency controls.
+Production-style backend e-commerce platform showcasing modern API development, database reliability, security, event-driven workflows, testing, and concurrency controls.
 
 ---
 
 # Current Release
 
-**Latest Stable Release:** `v1.2.0 Database & Quality`
+**Latest Stable Release:** `v1.4.0 Commerce Features`
 
-**Current Development:** `v1.3 Security (In Progress)`
+**Next Milestone:** `v1.5 DevOps`
 
 ---
 
@@ -27,56 +27,96 @@ Foundational commerce domain and REST API implementation.
 - Swagger/OpenAPI documentation
 - PostgreSQL Docker setup
 
-### Why it matters
-Establishes the domain model and baseline commerce workflows before optimization and hardening.
-
 ---
 
 ## v1.1 API Hardening ✅
 Focused on improving API contract quality and scalability.
 
 ### Includes
-- DTO refactor (remove entity exposure)
+- DTO refactor
 - Pagination
 - Sorting
 - Filtering
 - Request validation
-- Improved exception handling
-
-### Why it matters
-Moves the API from prototype-level toward production-grade API design.
+- Global exception handling
 
 ---
 
 ## v1.2 Database & Quality ✅
-Focused on reliability, data integrity, and engineering quality.
+Focused on reliability and integrity.
 
 ### Includes
-- Flyway database migrations
+- Flyway migrations
 - Integration testing
 - Auditing support
 - Optimistic locking
 - Concurrency protection
 
-### Why it matters
-Protects against schema drift, overselling, stale updates, and improves confidence through testing.
+---
+
+## v1.3 Security ✅
+Focused on authentication and access control.
+
+### Includes
+- JWT Authentication
+- Spring Security
+- Stateless security configuration
+- BCrypt password hashing
+- JWT request filtering
+- Role-based authorization
+- Protected endpoints
+
+### Roles
+```text
+ADMIN
+CUSTOMER
+```
+
+Access control:
+
+```text
+ADMIN
+- Products
+- Inventory
+- Coupons
+
+CUSTOMER
+- Orders
+- Payments
+- Shopping Cart
+```
 
 ---
 
-## v1.3 Security 🚧 (Current)
-Focused on authentication and access control.
+## v1.4 Commerce Features ✅
 
-### Completed
-- [x] JWT Authentication
-- [x] Stateless security configuration
-- [x] Password hashing (BCrypt)
-- [x] Protected API endpoints
+### v1.4.1 Shopping Cart
+- Customer carts
+- Cart items
+- Cart checkout
+- Cart-to-order flow
 
-### In Progress
-- [ ] Role-Based Authorization (ADMIN / CUSTOMER)
+### v1.4.2 Discounts & Coupons
+- Coupon engine
+- Percentage discounts
+- Fixed discounts
+- Discounted checkout totals
+- Discount persistence on orders
 
-### Why it matters
-Secures the platform and introduces real-world access control patterns.
+### v1.4.3 Kafka Order Events
+Published domain events:
+
+```text
+order-created
+payment-processed
+coupon-applied
+```
+
+Includes:
+- Kafka producers
+- Kafka consumers
+- Event serialization
+- Event-driven workflow foundations
 
 ---
 
@@ -84,13 +124,16 @@ Secures the platform and introduces real-world access control patterns.
 
 ## Commerce
 - Product catalog management
-- Inventory stock reservation
+- Inventory reservation
 - Order workflow
-- Payment processing simulation
+- Payment simulation
+- Shopping cart
+- Coupon discounts
+- Checkout flow
 
 ## API Design
 - DTO mappings
-- Pagination, filtering, sorting
+- Pagination / filtering / sorting
 - Validation
 - ProblemDetail error responses
 
@@ -98,20 +141,21 @@ Secures the platform and introduces real-world access control patterns.
 - Flyway migrations
 - Auditing
 - Optimistic locking
-- Concurrency safety
+- Concurrency protection
 
 ## Security
 - JWT Authentication
-- Stateless request security
-- BCrypt password hashing
+- Role-Based Access Control
 - Protected endpoints
-- Role authorization (in progress)
+- BCrypt password hashing
 
-## Platform
-- PostgreSQL in Docker
-- Swagger/OpenAPI
-- Java 21 Records
-- Layered architecture
+## Event Driven
+- Kafka integration
+- Domain event publishing
+- Event consumers
+
+## Testing
+- Integration tests
 
 ---
 
@@ -119,11 +163,11 @@ Secures the platform and introduces real-world access control patterns.
 
 ```text
 Controller
-  ↓
+ ↓
 Service
-  ↓
+ ↓
 Repository
-  ↓
+ ↓
 PostgreSQL
 ```
 
@@ -135,8 +179,10 @@ DTO Mapping
 Repository Pattern
 Flyway Migrations
 Integration Testing
-Concurrency Protection
+Optimistic Locking
 JWT Authentication
+Role Authorization
+Event Publishing
 ```
 
 ---
@@ -151,20 +197,36 @@ JWT Authentication
 - [x] Auditing Support
 - [x] Optimistic Locking
 - [x] JWT Authentication
+- [x] Role-Based Authorization
+- [x] Shopping Cart
+- [x] Discount / Coupon Engine
+- [x] Kafka Order Events
 
-## In Progress
-- [ ] Role-Based Authorization
+---
 
-## Planned
-### v1.4 Commerce Enhancements
-- Discounts / promotions
-- Order events
-- Event-driven workflows with Kafka
+## Upcoming
 
-### v1.5 DevOps
-- Dockerized app container
-- CI/CD pipeline
-- Monitoring / observability
+## v1.5 DevOps 🚧
+
+Planned:
+- [ ] Dockerized Spring Boot container
+- [ ] Multi-stage Docker builds
+- [ ] GitHub Actions CI/CD pipeline
+- [ ] Monitoring / observability
+- [ ] Testcontainers integration tests
+
+---
+
+## v2.0 Event Driven Microservices (Future)
+Planned:
+
+- [ ] Product Service
+- [ ] Order Service
+- [ ] Inventory Service
+- [ ] Payment Service
+- [ ] Kafka choreography
+- [ ] Saga patterns
+- [ ] API Gateway
 
 ---
 
@@ -174,29 +236,56 @@ JWT Authentication
 v1.0 Core REST API          ✅
 v1.1 API Hardening          ✅
 v1.2 Database & Quality     ✅
-v1.3 Security               🚧
+v1.3 Security               ✅
+v1.4 Commerce Features      ✅
+v1.5 DevOps                 Next
+v2.0 Microservices          Future
 ```
 
 ---
 
-# Security Design (Current)
+# Security Design
 
-Authentication powered by Spring Security.
+Powered by Spring Security.
 
 Includes:
 - JWT login
 - Token validation
+- Authorization filter
+- ADMIN / CUSTOMER roles
 - Protected endpoints
-- ADMIN / CUSTOMER role model (in progress)
 
-Upcoming:
+Authorization:
+
 ```text
-ADMIN:
-Product + Inventory management
+Public
+GET products
+Auth endpoints
 
-CUSTOMER:
-Orders + Payments
+ADMIN
+Products
+Inventory
+Coupons
+
+CUSTOMER
+Orders
+Payments
+Cart
 ```
+
+---
+
+# Event Design
+
+Current domain events:
+
+```text
+order-created
+payment-processed
+coupon-applied
+```
+
+Kafka-based producer/consumer architecture implemented as foundation for future event-driven decomposition.
 
 ---
 
@@ -205,25 +294,37 @@ Orders + Payments
 - Java 21
 - Spring Boot 3
 - Spring Security
+- Spring Data JPA
 - PostgreSQL
 - Flyway
+- Apache Kafka
 - Docker
 - Maven
 - Swagger/OpenAPI
+- JUnit
 
 ---
 
 # Running the Application
 
-## Start Database
+## Start Infrastructure
 ```bash
 docker compose up -d
 ```
+
+Starts:
+- PostgreSQL
+- Kafka
+- Zookeeper
+
+---
 
 ## Run API
 ```bash
 mvn spring-boot:run
 ```
+
+---
 
 ## Run Tests
 ```bash
@@ -232,7 +333,25 @@ mvn test
 
 ---
 
+Swagger:
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+# Future Focus
+Current focus is evolving this project toward:
+
+- DevOps readiness
+- Event-driven architecture
+- Microservices decomposition
+- Cloud-native deployment
+
+---
+
 # Author
+
 Built by Michael Westman
 
 GitHub:
