@@ -9,8 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -29,14 +27,6 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized")
-                        )
-                        .accessDeniedHandler((request, response, accessDeniedException) ->
-                                response.sendError(HttpStatus.FORBIDDEN.value(), "Forbidden")
-                        )
-                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
@@ -47,29 +37,14 @@ public class SecurityConfig {
                                 "/actuator/info"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**")
-                        .permitAll()
+                        // Public product browsing
+                        .requestMatchers(
+                                "/api/products",
+                                "/api/products/**"
+                        ).permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/products")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.DELETE, "/api/products/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers("/api/inventory/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers("/api/orders/**")
-                        .hasAnyRole("CUSTOMER", "ADMIN")
-
-                        .requestMatchers("/api/payments/**")
-                        .hasAnyRole("CUSTOMER", "ADMIN")
-
-                        .anyRequest()
-                        .authenticated()
+                        // Everything else requires a valid JWT
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
