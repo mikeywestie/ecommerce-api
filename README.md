@@ -2,110 +2,82 @@
 
 ![CI](https://github.com/mikeywestie/ecommerce-api/actions/workflows/ci.yml/badge.svg)
 
-Java 21 + Spring Boot 3 + PostgreSQL + Kafka + Swagger/OpenAPI
+Java 21 + Spring Boot 3 + PostgreSQL + Kafka + Docker
 
-Production-style backend e-commerce platform showcasing modern API development, database reliability, security, event-driven workflows, testing, and concurrency controls.
+Production-style backend e-commerce platform showcasing secure API development, event-driven workflows, DevOps engineering, observability, and distributed systems foundations.
 
 ---
 
 # Current Release
 
-**Latest Stable Release:** `v1.4.0 Commerce Features`
-
-**Next Milestone:** `v1.5 DevOps`
+**Latest Stable Release:** `v1.5.0 DevOps Complete` ✅  
+**Next Major Release:** `v2.0 Event-Driven Microservices`
 
 ---
 
 # Release Milestones
 
 ## v1.0 Core REST API ✅
-Foundational commerce domain and REST API implementation.
 
-### Includes
-- Product management
-- Inventory tracking
-- Order creation
+- Products
+- Inventory
+- Orders
 - Payment simulation
-- Swagger/OpenAPI documentation
-- PostgreSQL Docker setup
+- Swagger/OpenAPI
+- PostgreSQL
 
 ---
 
 ## v1.1 API Hardening ✅
-Focused on improving API contract quality and scalability.
 
-### Includes
-- DTO refactor
-- Pagination
-- Sorting
-- Filtering
-- Request validation
-- Global exception handling
+- DTO Refactor
+- Pagination / Sorting / Filtering
+- Validation
+- ProblemDetail exception handling
 
 ---
 
 ## v1.2 Database & Quality ✅
-Focused on reliability and integrity.
 
-### Includes
 - Flyway migrations
 - Integration testing
-- Auditing support
+- Auditing
 - Optimistic locking
 - Concurrency protection
 
 ---
 
 ## v1.3 Security ✅
-Focused on authentication and access control.
 
-### Includes
 - JWT Authentication
-- Spring Security
-- Stateless security configuration
+- Stateless Spring Security
 - BCrypt password hashing
-- JWT request filtering
-- Role-based authorization
-- Protected endpoints
+- Role-Based Authorization
 
 ### Roles
-```text
-ADMIN
-CUSTOMER
-```
-
-Access control:
 
 ```text
 ADMIN
-- Products
-- Inventory
-- Coupons
-
 CUSTOMER
-- Orders
-- Payments
-- Shopping Cart
 ```
 
 ---
 
 ## v1.4 Commerce Features ✅
 
-### v1.4.1 Shopping Cart
-- Customer carts
+### Shopping Cart
+- Cart checkout flow
 - Cart items
-- Cart checkout
-- Cart-to-order flow
+- Cart-to-order
 
-### v1.4.2 Discounts & Coupons
-- Coupon engine
+### Discounts / Coupons
 - Percentage discounts
 - Fixed discounts
-- Discounted checkout totals
-- Discount persistence on orders
+- Coupon engine
+- Discount persistence
 
-### v1.4.3 Kafka Order Events
+### Kafka Order Events
+
 Published domain events:
 
 ```text
@@ -114,11 +86,24 @@ payment-processed
 coupon-applied
 ```
 
-Includes:
-- Kafka producers
-- Kafka consumers
-- Event serialization
-- Event-driven workflow foundations
+---
+
+## v1.5 DevOps ✅
+
+### Completed
+- Dockerized application stack
+- Multi-stage Docker builds
+- GitHub Actions CI/CD
+- Observability / Actuator / Prometheus metrics
+- Testcontainers integration foundation
+
+### DevOps Features
+- Docker Compose stack
+- PostgreSQL + Kafka containers
+- CI build pipeline
+- Health probes
+- Metrics endpoint
+- Prometheus support
 
 ---
 
@@ -133,35 +118,26 @@ Includes:
 - Coupon discounts
 - Checkout flow
 
-## API Design
-- DTO mappings
-- Pagination / filtering / sorting
-- Validation
-- ProblemDetail error responses
-
-## Database Reliability
-- Flyway migrations
-- Auditing
-- Optimistic locking
-- Concurrency protection
-
 ## Security
 - JWT Authentication
 - Role-Based Access Control
 - Protected endpoints
-- BCrypt password hashing
 
 ## Event Driven
-- Kafka integration
-- Domain event publishing
-- Event consumers
+- Kafka producers
+- Kafka consumers
+- Domain events
+- Event workflow foundations
 
-## Testing
-- Integration tests
+## DevOps
+- Dockerized runtime
+- CI/CD pipeline
+- Observability
+- Testcontainers foundation
 
 ---
 
-# Architecture Highlights
+# Architecture
 
 ```text
 Controller
@@ -177,71 +153,81 @@ Patterns implemented:
 
 ```text
 REST APIs
-DTO Mapping
 Repository Pattern
-Flyway Migrations
-Integration Testing
+DTO Mapping
 Optimistic Locking
-JWT Authentication
-Role Authorization
+JWT Security
 Event Publishing
+Dockerized Deployment
+Observability
 ```
 
 ---
 
 # Roadmap
 
-## Completed
+## Completed ✅
+
 - [x] DTO Refactor
-- [x] Pagination / Filtering
 - [x] Flyway Migrations
 - [x] Integration Tests
-- [x] Auditing Support
-- [x] Optimistic Locking
 - [x] JWT Authentication
 - [x] Role-Based Authorization
 - [x] Shopping Cart
 - [x] Discount / Coupon Engine
 - [x] Kafka Order Events
+- [x] Dockerized Deployment
+- [x] GitHub Actions CI/CD
+- [x] Observability / Prometheus Metrics
+- [x] Testcontainers Foundation
 
 ---
 
-## Upcoming
+# v2.0 Event-Driven Microservices 🚀
 
-## v1.5 DevOps 🚧
+## Milestone 2.1 Service Decomposition
+- [ ] Split Product Service
+- [ ] Split Order Service
+- [ ] Split Inventory Service
+- [ ] Split Payment Service
 
-Planned:
-- [ ] Dockerized Spring Boot container
-- [ ] Multi-stage Docker builds
-- [ ] GitHub Actions CI/CD pipeline
-- [ ] Monitoring / observability
-- [ ] Testcontainers integration tests
-
----
-
-## v2.0 Event Driven Microservices (Future)
-Planned:
-
-- [ ] Product Service
-- [ ] Order Service
-- [ ] Inventory Service
-- [ ] Payment Service
+## Milestone 2.2 Messaging Patterns
 - [ ] Kafka choreography
-- [ ] Saga patterns
+- [ ] Saga pattern
+- [ ] Transactional Outbox Pattern
+- [ ] Idempotent Consumers
+- [ ] Retry / Dead Letter Queues
+
+## Milestone 2.3 Platform
 - [ ] API Gateway
+- [ ] Service Discovery
+- [ ] Distributed Configuration
+- [ ] Distributed Tracing
+
+## Milestone 2.4 Observability+
+- [ ] Prometheus Dashboards
+- [ ] Grafana Dashboards
+- [ ] Centralized Logging
+- [ ] Trace Correlation
+
+## Milestone 2.5 Cloud Native
+- [ ] Kubernetes Deployment
+- [ ] Helm Charts
+- [ ] GitOps
+- [ ] Cloud Deployment
 
 ---
 
 # Version Timeline
 
 ```text
-v1.0 Core REST API          ✅
-v1.1 API Hardening          ✅
-v1.2 Database & Quality     ✅
-v1.3 Security               ✅
-v1.4 Commerce Features      ✅
-v1.5 DevOps                 Next
-v2.0 Microservices          Future
+v1.0 Core REST API         ✅
+v1.1 API Hardening         ✅
+v1.2 Database Quality      ✅
+v1.3 Security              ✅
+v1.4 Commerce Features     ✅
+v1.5 DevOps                ✅
+v2.0 Microservices         🚀
 ```
 
 ---
@@ -257,7 +243,7 @@ Includes:
 - ADMIN / CUSTOMER roles
 - Protected endpoints
 
-Authorization:
+Authorization model:
 
 ```text
 Public
@@ -301,15 +287,18 @@ Kafka-based producer/consumer architecture implemented as foundation for future 
 - Flyway
 - Apache Kafka
 - Docker
-- Maven
-- Swagger/OpenAPI
+- GitHub Actions
+- Prometheus
 - JUnit
+- Testcontainers
+- Swagger/OpenAPI
 
 ---
 
 # Running the Application
 
 ## Start Infrastructure
+
 ```bash
 docker compose up -d
 ```
@@ -322,6 +311,7 @@ Starts:
 ---
 
 ## Run API
+
 ```bash
 mvn spring-boot:run
 ```
@@ -329,26 +319,41 @@ mvn spring-boot:run
 ---
 
 ## Run Tests
+
 ```bash
 mvn test
 ```
 
 ---
 
-Swagger:
+## Swagger
+
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
 ---
 
-# Future Focus
-Current focus is evolving this project toward:
+## Actuator
 
-- DevOps readiness
-- Event-driven architecture
-- Microservices decomposition
-- Cloud-native deployment
+```text
+http://localhost:8080/actuator/health
+http://localhost:8080/actuator/metrics
+http://localhost:8080/actuator/prometheus
+```
+
+---
+
+# Future Focus
+
+Moving toward:
+
+```text
+Distributed Systems
+Event-Driven Microservices
+Cloud Native Deployment
+Production Observability
+```
 
 ---
 
@@ -356,5 +361,5 @@ Current focus is evolving this project toward:
 
 Built by Michael Westman
 
-GitHub:
+GitHub:  
 https://github.com/mikeywestie/ecommerce-api
