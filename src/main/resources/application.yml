@@ -51,7 +51,19 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
+
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
 
 jwt:
   secret: "change-this-secret-key-to-something-long-and-secure-for-dev-only"
