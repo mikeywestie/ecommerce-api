@@ -1,5 +1,7 @@
 # E-Commerce RESTful API
 
+![CI](https://github.com/mikeywestie/ecommerce-api/actions/workflows/ci.yml/badge.svg)
+
 Java 21 + Spring Boot 3 + PostgreSQL + Kafka + Swagger/OpenAPI
 
 Production-style backend e-commerce platform showcasing modern API development, database reliability, security, event-driven workflows, testing, and concurrency controls.

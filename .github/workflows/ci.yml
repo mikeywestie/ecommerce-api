@@ -8,6 +8,7 @@ on:
       - "feat/**"
       - "feature/**"
       - "fix/**"
+
   pull_request:
     branches:
       - main
@@ -28,5 +29,8 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: Build and test with Maven
+      - name: Run verification
         run: mvn clean verify
+
+      - name: Package artifact
+        run: mvn package -DskipTests
