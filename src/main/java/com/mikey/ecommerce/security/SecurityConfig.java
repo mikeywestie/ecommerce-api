@@ -55,11 +55,12 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/actuator/**", //REMEMBER NOT TO ADD THE BELOW - STRICTLY FOR UI TESTINT
+                                "/actuator/**", //TODO: REMEMBER NOT TO ADD THE BELOW - STRICTLY FOR UI TESTINT
 
                                 "/api/orders/**",
                                 "/api/products/**",
-                                "/api/inventory/**"
+                                "/api/inventory/**",
+                                "/api/dashboard/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
