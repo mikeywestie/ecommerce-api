@@ -1,12 +1,16 @@
 package com.mikey.ecommerce.order;
 
 import com.mikey.ecommerce.common.ApiException;
+import com.mikey.ecommerce.dto.order.OrderItemResponse;
+import com.mikey.ecommerce.dto.order.OrderResponse;
 import com.mikey.ecommerce.inventory.Inventory;
 import com.mikey.ecommerce.inventory.InventoryRepository;
 import com.mikey.ecommerce.product.Product;
 import com.mikey.ecommerce.product.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -21,6 +25,24 @@ public class OrderService {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.inventoryRepository = inventoryRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .map(order -> new OrderResponse(
+                        order.getId(),
+                        order.getCustomerName(),
+                        order.getCustomerEmail(),
+                        order.getStatus() != null ? order.getStatus().name() : "UNKNOWN",
+                        order.getTotalAmount(),
+                        order.getCouponCode(),
+                        order.getDiscountAmount(),
+                        order.getCreatedAt(),
+                        List.of() // temporarily ignore items
+                ))
+                .toList();
     }
 
     @Transactional

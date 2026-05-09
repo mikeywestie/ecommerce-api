@@ -2,6 +2,15 @@ server:
   port: 8080
 
 spring:
+  logging:
+    level:
+      org.springframework.web: DEBUG
+      com.mikey.ecommerce: DEBUG
+
+  server:
+    error:
+      include
+
   application:
     name: ecommerce-api
 
@@ -23,6 +32,8 @@ spring:
     enabled: true
 
   kafka:
+    listener:
+      auto-startup: true
     bootstrap-servers: localhost:9092
 
     producer:

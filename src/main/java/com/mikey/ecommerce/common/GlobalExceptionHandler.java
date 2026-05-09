@@ -1,5 +1,6 @@
 package com.mikey.ecommerce.common;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -54,12 +55,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleUnexpected(Exception ex) {
+    public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
+        // Print the full stack trace to the Docker logs
+        ex.printStackTrace();
+
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred"
         );
         detail.setType(URI.create("https://api.ecommerce.local/errors/internal-server-error"));
+        detail.setInstance(URI.create(request.getRequestURI()));
+
         return detail;
     }
 }
