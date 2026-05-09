@@ -57,11 +57,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/actuator/**", //TODO: REMEMBER NOT TO ADD THE BELOW - STRICTLY FOR UI TESTINT
 
-                                "/api/orders/**",
-                                "/api/products/**",
-                                "/api/inventory/**",
-                                "/api/dashboard/**",
-                                "/api/payments/**"
+                                "/api/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
