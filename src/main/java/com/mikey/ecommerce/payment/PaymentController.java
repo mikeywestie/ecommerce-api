@@ -1,7 +1,6 @@
 package com.mikey.ecommerce.payment;
 
 import com.mikey.ecommerce.dto.payment.PaymentResponse;
-import com.mikey.ecommerce.mapper.InventoryMapper;
 import com.mikey.ecommerce.mapper.PaymentMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
