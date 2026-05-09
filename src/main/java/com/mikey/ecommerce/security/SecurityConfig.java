@@ -55,23 +55,21 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/actuator/**", //TODO: REMEMBER NOT TO ADD THE BELOW - STRICTLY FOR UI TESTINT
-
-                                "/api/**"
+                                "/actuator/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+
+                        .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
+                        .requestMatchers("/api/inventory/**").hasRole("ADMIN")
+                        .requestMatchers("/api/coupons/**").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/inventory/**").hasRole("ADMIN")
-
-                        .requestMatchers("/api/coupons/**").hasRole("ADMIN")
-
-                        .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
-                        .requestMatchers("/api/payments/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers("/api/payments/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
 
                         .anyRequest().authenticated()
