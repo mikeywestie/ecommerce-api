@@ -1,5 +1,7 @@
 # 🛒 E-Commerce RESTful API
 
+![Architecture_Diagram.png](docs/images/Architecture_Diagram.png)
+
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
@@ -9,6 +11,54 @@
 ![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-red)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-orange)
 ![CI](https://img.shields.io/badge/CI-GitHub_Actions-blueviolet)
+
+
+## 📚 API Documentation
+
+The platform exposes a fully documented REST API using OpenAPI 3 and Swagger UI. The screenshots below showcase the available endpoints across the different business domains.
+
+### Swagger UI Overview
+![Swagger UI](docs/images/swagger-ui.png)
+
+### Products Controller
+![Products Endpoints](docs/images/Products_Endpoints.png)
+
+### Payments Controller
+![Payments Endpoints](docs/images/Payments_Endpoints.png)
+
+### Orders Controller
+![Orders Endpoints](docs/images/Orders_Endpoints.png)
+
+### Coupon Controller
+![Coupon Endpoints](docs/images/Coupon_Endpoints.png)
+
+### Cart Controller
+![Cart Endpoints](docs/images/Cart_Endpoints.png)
+
+### Authentication Controller
+![Auth Endpoints](docs/images/Auth_Endpoints.png)
+
+### Inventory Controller
+![Inventory Endpoints](docs/images/Inventory_Endpoints.png)
+
+### Dashboard Controller
+![Dashboard Endpoints](docs/images/Dashboard_Endpoints.png)
+
+---
+
+## 🐳 Containerized Infrastructure
+
+The entire development environment is orchestrated with Docker Compose, including PostgreSQL, Apache Kafka, Prometheus, and Grafana.
+
+![Docker Containers](docs/images/Docker_Container.png)
+
+---
+
+## ❤️ Application Health
+
+Spring Boot Actuator provides health, liveness, and readiness endpoints to ensure the application and all dependencies are operating correctly.
+
+![Actuator Health](docs/images/Actuator_Health.png)
 
 Production-style backend e-commerce platform built to showcase secure API development, event-driven architecture, observability, and DevOps practices. The platform models realistic commerce workflows and is complemented by a React-based admin dashboard. Based on the README you shared and updated to reflect your current progress, including Prometheus and Grafana integration. :contentReference[oaicite:0]{index=0}
 

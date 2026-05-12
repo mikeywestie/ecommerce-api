@@ -1,0 +1,274 @@
+{
+  "info": {
+    "name": "E-Commerce API",
+    "_postman_id": "ecommerce-api-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "jwtToken", "value": "" }
+  ],
+  "item": [
+
+    {
+      "name": "Authentication",
+      "item": [
+
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header":[
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/auth/register",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n  \"name\":\"Michael\",\n  \"email\":\"michael@example.com\",\n  \"password\":\"Password123\"\n}"
+            }
+          }
+        },
+
+        {
+          "name":"Login",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/auth/login",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n  \"email\":\"michael@example.com\",\n  \"password\":\"Password123\"\n}"
+            }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name":"Products",
+      "item":[
+
+        {
+          "name":"Get Products",
+          "request":{
+            "method":"GET",
+            "url":"{{baseUrl}}/api/products"
+          }
+        },
+
+        {
+          "name":"Create Product (ADMIN)",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"},
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/products",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n\"name\":\"Keyboard\",\n\"description\":\"Mechanical\",\n\"price\":1299.99,\n\"initialStock\":10\n}"
+            }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name":"Inventory",
+      "item":[
+
+        {
+          "name":"Get Inventory (ADMIN)",
+          "request":{
+            "method":"GET",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/inventory"
+          }
+        },
+
+        {
+          "name":"Add Stock (ADMIN)",
+          "request":{
+            "method":"PATCH",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"},
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/inventory/1/stock",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n\"quantity\":5\n}"
+            }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name":"Orders",
+      "item":[
+
+        {
+          "name":"Create Order",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"},
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/orders",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n\"customerName\":\"Michael\",\n\"customerEmail\":\"michael@example.com\",\n\"items\":[\n {\"productId\":1,\"quantity\":2}\n]\n}"
+            }
+          }
+        },
+
+        {
+          "name":"Get Orders",
+          "request":{
+            "method":"GET",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/orders"
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name":"Payments",
+      "item":[
+
+        {
+          "name":"Process Payment",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"},
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/payments",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n\"orderId\":1,\n\"paymentMethod\":\"CARD\"\n}"
+            }
+          }
+        },
+
+        {
+          "name":"Get Payments",
+          "request":{
+            "method":"GET",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/payments"
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name":"Shopping Cart",
+      "item":[
+
+        {
+          "name":"Add Item To Cart",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"},
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/cart/items",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n\"productId\":1,\n\"quantity\":2\n}"
+            }
+          }
+        },
+
+        {
+          "name":"View Cart",
+          "request":{
+            "method":"GET",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/cart"
+          }
+        },
+
+        {
+          "name":"Apply Coupon",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/cart/apply-coupon/SAVE10"
+          }
+        },
+
+        {
+          "name":"Checkout Cart",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/cart/checkout"
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name":"Coupons",
+      "item":[
+
+        {
+          "name":"Create Coupon (ADMIN)",
+          "request":{
+            "method":"POST",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"},
+              {"key":"Content-Type","value":"application/json"}
+            ],
+            "url":"{{baseUrl}}/api/coupons",
+            "body":{
+              "mode":"raw",
+              "raw":"{\n\"code\":\"SAVE10\",\n\"type\":\"PERCENTAGE\",\n\"value\":10,\n\"expiresAt\":\"2026-12-31T23:59:59Z\"\n}"
+            }
+          }
+        },
+
+        {
+          "name":"Get Coupons",
+          "request":{
+            "method":"GET",
+            "header":[
+              {"key":"Authorization","value":"Bearer {{jwtToken}}"}
+            ],
+            "url":"{{baseUrl}}/api/coupons"
+          }
+        }
+
+      ]
+    }
+
+  ]
+}
