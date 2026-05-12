@@ -12,7 +12,6 @@
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-orange)
 ![CI](https://img.shields.io/badge/CI-GitHub_Actions-blueviolet)
 
-
 ## 📚 API Documentation
 
 The platform exposes a fully documented REST API using OpenAPI 3 and Swagger UI. The screenshots below showcase the available endpoints across the different business domains.
@@ -60,7 +59,14 @@ Spring Boot Actuator provides health, liveness, and readiness endpoints to ensur
 
 ![Actuator Health](docs/images/Actuator_Health.png)
 
-Production-style backend e-commerce platform built to showcase secure API development, event-driven architecture, observability, and DevOps practices. The platform models realistic commerce workflows and is complemented by a React-based admin dashboard. Based on the README you shared and updated to reflect your current progress, including Prometheus and Grafana integration. :contentReference[oaicite:0]{index=0}
+---
+
+Production-style backend e-commerce platform built to showcase secure API development, event-driven architecture, observability, and DevOps practices.
+
+The platform models realistic commerce workflows and is complemented by a React-based admin dashboard for operational visibility.
+
+Frontend Admin Dashboard:  
+➡️ https://github.com/mikeywestie/ecommerce-admin-ui
 
 ---
 
@@ -68,28 +74,25 @@ Production-style backend e-commerce platform built to showcase secure API develo
 
 This project demonstrates practical software engineering capabilities including:
 
-- Designing layered architectures
-- Building secure REST APIs
-- Implementing JWT authentication and role-based access control
-- Applying optimistic locking and concurrency protection
-- Publishing domain events with Apache Kafka
-- Containerizing applications with Docker
-- Exposing health and metrics endpoints
-- Visualizing operational metrics with Prometheus and Grafana
-- Automating builds with GitHub Actions
-- Writing production-quality documentation
-
-Frontend Admin Dashboard:
-
-➡️ **Ecommerce Admin UI**  
-https://github.com/mikeywestie/ecommerce-admin-ui
+- Layered Spring Boot architecture
+- Secure REST API design
+- JWT authentication and role-based access control
+- DTO-based API contracts
+- Bean validation and standardized ProblemDetail errors
+- PostgreSQL persistence with Flyway migrations
+- Optimistic locking and concurrency protection
+- Kafka domain event publishing
+- Docker Compose local infrastructure
+- Spring Boot Actuator health and metrics
+- Prometheus and Grafana observability
+- GitHub Actions CI verification
+- Testcontainers-based integration testing foundation
 
 ---
 
 ## 🚀 Current Release
 
-**Latest Stable Release:** `v1.6.0 Observability Complete ✅`
-
+**Latest Stable Release:** `v1.6.0 Observability Complete ✅`  
 **Next Major Release:** `v2.0 Event-Driven Microservices 🚀`
 
 ---
@@ -100,13 +103,13 @@ Each milestone reflects an intentional architectural progression, prioritizing c
 
 ### Architectural Trade-Offs and Decisions
 
-- **Modular Monolith First** — Simplified development and debugging while preserving a clear migration path to microservices.
-- **REST APIs Before Kafka Workflows** — Stabilized business logic before introducing asynchronous communication.
-- **DTO Mapping Over Entity Exposure** — Protected API contracts from persistence model changes.
-- **Optimistic Locking** — Improved throughput while protecting inventory updates.
-- **Docker Compose** — Created a reproducible development environment.
-- **Metrics Before Dashboards** — Exposed Prometheus metrics before adding Grafana dashboards.
-- **Incremental Testing Strategy** — Established a Testcontainers foundation before expanding test coverage.
+- **Modular Monolith First** — Simplifies development and debugging while preserving a clear migration path to microservices.
+- **REST APIs Before Kafka Workflows** — Stabilizes business rules before introducing asynchronous orchestration.
+- **DTO Mapping Over Entity Exposure** — Keeps persistence concerns separate from public API contracts.
+- **Optimistic Locking** — Protects inventory updates while maintaining good throughput.
+- **Docker Compose** — Provides a reproducible local development environment.
+- **Metrics Before Dashboards** — Exposes reliable metrics before visualizing them.
+- **Incremental Testing Strategy** — Builds a Testcontainers foundation before expanding coverage.
 
 ---
 
@@ -115,12 +118,12 @@ Each milestone reflects an intentional architectural progression, prioritizing c
 Implemented foundational commerce capabilities.
 
 **Features**
-- Product Catalog
-- Inventory Management
+- Product catalog
+- Inventory management
 - Orders
-- Payment Simulation
-- PostgreSQL Persistence
-- Swagger/OpenAPI Documentation
+- Payment simulation
+- PostgreSQL persistence
+- Swagger/OpenAPI documentation
 
 **Why this milestone matters**  
 Established the core domain model and API structure.
@@ -132,13 +135,13 @@ Established the core domain model and API structure.
 Improved API usability and resilience.
 
 **Features**
-- DTO Refactor
+- DTO refactor
 - Validation
-- Pagination, Sorting, Filtering
-- ProblemDetail Exception Handling
+- Pagination, sorting, and filtering
+- ProblemDetail exception handling
 
 **Why this milestone matters**  
-Separated API contracts from entities and standardized errors.
+Separated API contracts from entities and standardized error responses.
 
 ---
 
@@ -147,14 +150,14 @@ Separated API contracts from entities and standardized errors.
 Added production-quality data practices.
 
 **Features**
-- Flyway Migrations
-- Auditing (`created_at`, `updated_at`)
-- Optimistic Locking
-- Concurrency Protection
-- Integration Tests
+- Flyway migrations
+- Auditing fields
+- Optimistic locking
+- Concurrency protection
+- Integration tests foundation
 
 **Why this milestone matters**  
-Ensures repeatable schema evolution and data integrity.
+Supports repeatable schema evolution and stronger data integrity.
 
 ---
 
@@ -163,17 +166,17 @@ Ensures repeatable schema evolution and data integrity.
 Secured the API.
 
 **Features**
-- JWT Authentication
+- JWT authentication
 - Stateless Spring Security
-- BCrypt Password Hashing
-- Role-Based Authorization
+- BCrypt password hashing
+- Role-based authorization
 
 **Roles**
 - ADMIN
 - CUSTOMER
 
 **Why this milestone matters**  
-Demonstrates modern API security patterns.
+Demonstrates modern API security patterns used in enterprise systems.
 
 ---
 
@@ -182,11 +185,11 @@ Demonstrates modern API security patterns.
 Implemented realistic commerce workflows.
 
 **Features**
-- Shopping Cart
-- Cart Checkout Flow
-- Coupon Engine
-- Fixed and Percentage Discounts
-- Kafka Domain Events
+- Shopping cart
+- Cart checkout flow
+- Coupon engine
+- Fixed and percentage discounts
+- Kafka domain events
 
 **Published Events**
 - `order-created`
@@ -194,7 +197,7 @@ Implemented realistic commerce workflows.
 - `coupon-applied`
 
 **Why this milestone matters**  
-Introduced event-driven architecture and richer business logic.
+Introduced event-driven thinking and richer business logic.
 
 ---
 
@@ -203,11 +206,11 @@ Introduced event-driven architecture and richer business logic.
 Operationalized the platform.
 
 **Features**
-- Docker Compose Stack
-- Multi-stage Docker Builds
-- GitHub Actions CI/CD Foundation
+- Docker Compose stack
+- Multi-stage Docker builds
+- GitHub Actions CI foundation
 - Spring Boot Actuator
-- Testcontainers Foundation
+- Testcontainers foundation
 
 **Why this milestone matters**  
 Introduced deployment automation and operational tooling.
@@ -219,16 +222,42 @@ Introduced deployment automation and operational tooling.
 Added production-style monitoring.
 
 **Features**
-- Prometheus Metrics Endpoint
-- Prometheus Scraping
-- Grafana Dashboards
-- JVM Metrics
-- HTTP Metrics
-- Database Connection Metrics
-- Kafka Consumer Metrics
+- Prometheus metrics endpoint
+- Prometheus scraping
+- Grafana dashboards
+- JVM metrics
+- HTTP metrics
+- Database connection metrics
+- Kafka metrics foundation
 
 **Why this milestone matters**  
-Provides real-time visibility into system health and performance.
+Provides visibility into application health and runtime behavior.
+
+---
+
+## 🏗️ Architecture
+
+```text
+React Admin UI
+      │
+      ▼
+Spring Boot REST API
+      │
+ ┌────┼────────────┐
+ ▼    ▼            ▼
+JWT PostgreSQL   Kafka
+      │            │
+      ▼            ▼
+Spring Actuator  Domain Events
+      │
+      ▼
+Prometheus
+      │
+      ▼
+Grafana
+```
+
+For a deeper portfolio-friendly explanation, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ---
 
@@ -262,19 +291,6 @@ Provides real-time visibility into system health and performance.
 
 ---
 
-## 🏗️ Architecture
+## 💼 Portfolio Value
 
-```text
-Controller
-   ↓
-Service
-   ↓
-Repository
-   ↓
-PostgreSQL
-
-             Kafka Domain Events
-                    ↓
-                Prometheus
-                    ↓
-                 Grafana
+This repository is designed to demonstrate full-stack backend capability beyond CRUD APIs. It shows practical experience with secure API design, integration patterns, data integrity, asynchronous messaging, Docker-based infrastructure, monitoring, and CI automation.
