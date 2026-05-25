@@ -261,6 +261,145 @@ For a deeper portfolio-friendly explanation, see [`docs/ARCHITECTURE.md`](docs/A
 
 ---
 
+## 🔁 System Flow
+
+The platform models an end-to-end commerce flow, from authenticated API usage through order placement, payment processing, inventory updates, and operational monitoring.
+
+```text
+User / Admin Dashboard
+        │
+        ▼
+Authenticate via JWT
+        │
+        ▼
+Create cart / place order
+        │
+        ▼
+Order workflow validates business rules
+        │
+        ▼
+Domain event published to Kafka
+        │
+        ▼
+Payment workflow processes transaction outcome
+        │
+        ▼
+Inventory is updated with concurrency protection
+        │
+        ▼
+Application metrics emitted through Actuator
+        │
+        ▼
+Prometheus scrapes metrics
+        │
+        ▼
+Grafana visualizes runtime health and behaviour
+```
+
+This flow is intentionally designed to show how a traditional REST API can evolve toward event-driven order management while still keeping the current implementation easy to run, test, and reason about locally.
+
+---
+
+## 🧪 API Usage Examples
+
+### Authenticate
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
+
+```json
+{
+  "email": "<user-email>",
+  "password": "<your-password>"
+}
+```
+
+Example response:
+
+```json
+{
+  "token": "<jwt-token>"
+}
+```
+
+### Create an Order
+
+```http
+POST /api/orders
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+```
+
+```json
+{
+  "customerName": "Michael Westman",
+  "customerEmail": "michael@example.com",
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2
+    }
+  ],
+  "couponCode": "WELCOME10"
+}
+```
+
+### Process a Payment
+
+```http
+POST /api/payments
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+```
+
+```json
+{
+  "orderId": 1,
+  "paymentMethod": "CARD",
+  "amount": 1299.99
+}
+```
+
+### Update Inventory
+
+```http
+PATCH /api/inventory/{productId}
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+```
+
+```json
+{
+  "quantityAvailable": 25
+}
+```
+
+These examples are intended to make the project easy to explore during code reviews, technical interviews, and portfolio walkthroughs.
+
+---
+
+## 🧠 Engineering Challenges Solved
+
+This project is not only a CRUD API. It intentionally includes practical backend engineering concerns that appear in real commerce and order management systems.
+
+| Challenge | Approach |
+| --- | --- |
+| Preventing accidental entity exposure | DTO-based API contracts separate persistence models from external responses. |
+| Standardizing validation and error responses | Bean Validation and Spring `ProblemDetail` provide consistent API feedback. |
+| Protecting inventory updates | Optimistic locking and concurrency-aware persistence reduce overselling risk. |
+| Securing protected resources | JWT-based stateless authentication and role-based authorization protect API operations. |
+| Supporting repeatable database changes | Flyway migrations make schema evolution trackable and reproducible. |
+| Introducing asynchronous workflows | Kafka domain events demonstrate event-driven architecture foundations. |
+| Running infrastructure locally | Docker Compose provisions PostgreSQL, Kafka, Prometheus, and Grafana. |
+| Monitoring runtime behaviour | Actuator, Prometheus, and Grafana expose health, JVM, HTTP, and database metrics. |
+| Building toward production readiness | CI verification and Testcontainers foundations support safer future changes. |
+
+These decisions help demonstrate maintainability, scalability thinking, operational awareness, and clean backend design.
+
+---
+
 ## 🛣️ Roadmap
 
 ### v2.0 Event-Driven Microservices 🚀
