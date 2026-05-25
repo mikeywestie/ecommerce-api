@@ -1,23 +1,18 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
 
 spring:
-  logging:
-    level:
-      org.springframework.web: DEBUG
-      com.mikey.ecommerce: DEBUG
-
-  server:
-    error:
-      include
-
   application:
     name: ecommerce-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce_db
-    username: ecommerce_user
-    password: ecommerce_pass
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -34,14 +29,14 @@ spring:
   kafka:
     listener:
       auto-startup: true
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     consumer:
-      group-id: ecommerce-group
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID:ecommerce-group}
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -50,7 +45,12 @@ spring:
         spring:
           json:
             trusted:
-              packages: "*"
+              packages: ${SPRING_KAFKA_TRUSTED_PACKAGES:com.mikey.ecommerce.events}
+
+logging:
+  level:
+    org.springframework.web: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB:INFO}
+    com.mikey.ecommerce: ${LOGGING_LEVEL_COM_MIKEY_ECOMMERCE:INFO}
 
 springdoc:
   swagger-ui:
@@ -62,11 +62,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
 
   endpoint:
     health:
-      show-details: always
+      show-details: ${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS:when_authorized}
       probes:
         enabled: true
 
@@ -76,6 +76,10 @@ management:
     livenessstate:
       enabled: true
 
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}
+
 jwt:
-  secret: "change-this-secret-key-to-something-long-and-secure-for-dev-only"
-  expiration-ms: 86400000
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
