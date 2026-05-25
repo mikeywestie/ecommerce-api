@@ -12,6 +12,11 @@ spring:
       include-message: ${SERVER_ERROR_INCLUDE_MESSAGE:never}
       include-binding-errors: ${SERVER_ERROR_INCLUDE_BINDING_ERRORS:never}
       include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:never}
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
 
   application:
     name: ecommerce-api
@@ -54,6 +59,11 @@ spring:
             trusted:
               packages: ${SPRING_KAFKA_JSON_TRUSTED_PACKAGES:com.mikey.ecommerce.events}
 
+logging:
+  level:
+    org.springframework.web: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB:INFO}
+    com.mikey.ecommerce: ${LOGGING_LEVEL_COM_MIKEY_ECOMMERCE:INFO}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -78,6 +88,10 @@ management:
     livenessstate:
       enabled: ${MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED:true}
 
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}
+
 jwt:
-  secret: ${JWT_SECRET:change-this-secret-key-to-something-long-and-secure-for-dev-only}
+  secret: ${JWT_SECRET}
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
