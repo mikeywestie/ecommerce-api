@@ -31,7 +31,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
@@ -55,11 +55,13 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/actuator/**"
+                                "/actuator/health",
+                                "/actuator/health/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
+                        .requestMatchers("/actuator/prometheus", "/actuator/metrics/**", "/actuator/info").hasRole("ADMIN")
                         .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
                         .requestMatchers("/api/inventory/**").hasRole("ADMIN")
                         .requestMatchers("/api/coupons/**").hasRole("ADMIN")
