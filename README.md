@@ -10,8 +10,9 @@
 ![JWT](https://img.shields.io/badge/Security-JWT-success)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-red)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-orange)
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-blueviolet)
-
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-success)
+![Tests](https://img.shields.io/badge/Tests-40_Passing-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-JaCoCo-orange)
 ## 📚 API Documentation
 
 The platform exposes a fully documented REST API using OpenAPI 3 and Swagger UI. The screenshots below showcase the available endpoints across the different business domains.
@@ -87,12 +88,108 @@ This project demonstrates practical software engineering capabilities including:
 - Prometheus and Grafana observability
 - GitHub Actions CI verification
 - Testcontainers-based integration testing foundation
+- JaCoCo code coverage reporting
+- Service layer unit testing
+- MockMvc controller testing
+- Authentication and authorization testing
+- Continuous Integration with GitHub Actions
+
+---
+
+## 🧪 Test & Quality Status
+
+![JaCoCo_Test_Coverage.png](docs/images/JaCoCo_Test_Coverage.png)
+
+The project includes automated testing across service, controller, authentication, and security layers.
+
+### Current Test Suite
+
+| Test Suite | Tests |
+|------------|-------:|
+| CartServiceTest | 6 |
+| CouponServiceTest | 3 |
+| OrderServiceTest | 3 |
+| PaymentServiceTest | 5 |
+| ProductControllerTest | 7 |
+| AuthControllerTest | 3 |
+| AuthServiceTest | 8 |
+| JwtServiceTest | 4 |
+| Testcontainers Smoke Test | 1 |
+| **Total** | **40** |
+
+### Security Rules Covered
+
+The authentication module contains automated tests validating:
+
+- Customer registration
+- Default customer role assignment
+- Initial administrator bootstrap registration
+- Prevention of unauthorized administrator creation
+- Duplicate email validation
+- JWT generation and validation
+- Authentication success scenarios
+- Authentication failure scenarios
+
+### Latest Test Results
+
+Tests run: 40  
+Failures: 0  
+Errors: 0  
+Skipped: 1  
+BUILD SUCCESS
+
+---
+
+## 📊 Code Coverage
+
+JaCoCo is integrated into the Maven build lifecycle and generates code coverage reports during verification.
+
+Generate coverage locally:
+
+```bash
+mvn clean verify
+
+Coverage reports are available at:
+
+target/site/jacoco/index.html
+Latest Coverage Report
+
+
+
+
+Quality Improvements
+
+Recent quality improvements include:
+
+GitHub Actions Continuous Integration
+JaCoCo Coverage Reporting
+Expanded Service Layer Testing
+Expanded MockMvc Controller Testing
+Authentication Service Testing
+Security Rule Validation
+Role-Based Registration Testing
+v1.7 Quality & Security Hardening ✅
+
+Features
+
+GitHub Actions CI Pipeline
+JaCoCo Code Coverage Reporting
+AuthService Test Suite
+Expanded MockMvc Controller Tests
+Expanded Service Layer Tests
+Administrator Bootstrap Registration Rules
+Security-Focused Test Coverage
+Customer and Administrator Registration Validation
+
+Why this milestone matters
+
+Demonstrates production-quality engineering practices including automated verification, security rule validation, code coverage analysis, continuous integration, and maintainable test-driven development practices.
 
 ---
 
 ## 🚀 Current Release
 
-**Latest Stable Release:** `v1.6.0 Observability Complete ✅`  
+**Latest Stable Release:** `v1.7.0 Quality & Security Hardening ✅`  
 **Next Major Release:** `v2.0 Event-Driven Microservices 🚀`
 
 ---
