@@ -47,7 +47,8 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest(
                 "Michael Westman",
                 "michael@example.com",
-                "password123"
+                "password123",
+                null
         );
 
         when(authService.register(any(RegisterRequest.class)))
@@ -98,7 +99,8 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest(
                 "Michael Westman",
                 "not-an-email",
-                "password123"
+                "password123",
+                null
         );
 
         mockMvc.perform(post("/api/auth/register")

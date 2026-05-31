@@ -27,13 +27,19 @@ public class AuthService {
             throw new ApiException("Email already registered");
         }
 
+        Role requestedRole = request.role() == null
+                ? Role.CUSTOMER
+                : request.role();
+
+        if (requestedRole == Role.ADMIN && appUserRepository.existsByRole(Role.ADMIN)) {
+            throw new ApiException("Only an admin can register another admin");
+        }
+
         AppUser user = new AppUser(
                 request.name(),
                 request.email(),
                 passwordEncoder.encode(request.password()),
-                //TODO: Update this so Admin can register too.
-                // Only an admin should be able to load another admin
-                Role.CUSTOMER
+                requestedRole
         );
 
         AppUser savedUser = appUserRepository.save(user);
