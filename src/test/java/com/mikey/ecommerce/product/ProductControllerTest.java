@@ -1,0 +1,238 @@
+package com.mikey.ecommerce.product;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mikey.ecommerce.inventory.Inventory;
+import com.mikey.ecommerce.inventory.InventoryRepository;
+import com.mikey.ecommerce.common.ApiException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ExtendWith(MockitoExtension.class)
+class ProductControllerTest {
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @Mock
+    private InventoryRepository inventoryRepository;
+
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setUp() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new ProductController(productRepository, inventoryRepository))
+                .setValidator(validator)
+                .build();
+
+        objectMapper = new ObjectMapper();
+    }
+
+    @Test
+    void findAll_shouldReturnPagedProducts() throws Exception {
+        Product product = productWithId(
+                1L,
+                "Mechanical Keyboard",
+                "RGB keyboard",
+                new BigDecimal("1299.99")
+        );
+
+        when(productRepository.findByNameContainingIgnoreCaseAndPriceBetween(
+                eq("keyboard"),
+                eq(BigDecimal.ZERO),
+                eq(new BigDecimal("999999999")),
+                any(Pageable.class)
+        )).thenReturn(new PageImpl<>(List.of(product)));
+
+        mockMvc.perform(get("/api/products")
+                        .param("search", "keyboard"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Mechanical Keyboard"))
+                .andExpect(jsonPath("$.content[0].price").value(1299.99))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void findById_shouldReturnProduct() throws Exception {
+        Product product = productWithId(
+                1L,
+                "Mechanical Keyboard",
+                "RGB keyboard",
+                new BigDecimal("1299.99")
+        );
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        mockMvc.perform(get("/api/products/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Mechanical Keyboard"))
+                .andExpect(jsonPath("$.description").value("RGB keyboard"))
+                .andExpect(jsonPath("$.price").value(1299.99));
+    }
+
+    @Test
+    void create_shouldSaveProductAndInventory() throws Exception {
+        ProductRequest request = new ProductRequest(
+                "Mechanical Keyboard",
+                "RGB keyboard",
+                new BigDecimal("1299.99"),
+                10
+        );
+
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
+            Product product = invocation.getArgument(0);
+            setField(product, "id", 1L);
+            return product;
+        });
+
+        mockMvc.perform(post("/api/products")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Mechanical Keyboard"))
+                .andExpect(jsonPath("$.price").value(1299.99));
+
+        ArgumentCaptor<Inventory> inventoryCaptor =
+                ArgumentCaptor.forClass(Inventory.class);
+
+        verify(inventoryRepository).save(inventoryCaptor.capture());
+
+        assertThat(inventoryCaptor.getValue().getProduct().getName())
+                .isEqualTo("Mechanical Keyboard");
+        assertThat(inventoryCaptor.getValue().getQuantityAvailable())
+                .isEqualTo(10);
+    }
+
+    @Test
+    void create_shouldReturnBadRequestWhenNameIsBlank() throws Exception {
+        ProductRequest request = new ProductRequest(
+                "",
+                "RGB keyboard",
+                new BigDecimal("1299.99"),
+                10
+        );
+
+        mockMvc.perform(post("/api/products")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verify(productRepository, never()).save(any());
+        verify(inventoryRepository, never()).save(any());
+    }
+
+    @Test
+    void update_shouldUpdateExistingProduct() throws Exception {
+        Product product = productWithId(
+                1L,
+                "Old Keyboard",
+                "Old description",
+                new BigDecimal("999.99")
+        );
+
+        ProductRequest request = new ProductRequest(
+                "Mechanical Keyboard",
+                "RGB keyboard",
+                new BigDecimal("1299.99"),
+                null
+        );
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(product)).thenReturn(product);
+
+        mockMvc.perform(put("/api/products/1")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Mechanical Keyboard"))
+                .andExpect(jsonPath("$.description").value("RGB keyboard"))
+                .andExpect(jsonPath("$.price").value(1299.99));
+    }
+
+    @Test
+    void delete_shouldDeleteProductWhenItExists() throws Exception {
+        when(productRepository.existsById(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/products/1"))
+                .andExpect(status().isOk());
+
+        verify(productRepository).deleteById(1L);
+    }
+
+    @Test
+    void delete_shouldThrowExceptionWhenProductDoesNotExist() {
+        when(productRepository.existsById(99L)).thenReturn(false);
+
+        assertThatThrownBy(() ->
+                mockMvc.perform(delete("/api/products/99"))
+        )
+                .hasRootCauseInstanceOf(ApiException.class)
+                .hasMessageContaining("Product not found");
+
+        verify(productRepository, never()).deleteById(anyLong());
+    }
+
+    private Product productWithId(
+            Long id,
+            String name,
+            String description,
+            BigDecimal price
+    ) {
+        Product product = new Product(name, description, price);
+        setField(product, "id", id);
+        return product;
+    }
+
+    private void setField(Object target, String fieldName, Object value) {
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            throw new IllegalStateException(
+                    "Could not set " + fieldName + " for test",
+                    ex
+            );
+        }
+    }
+}
