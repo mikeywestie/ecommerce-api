@@ -1,48 +1,50 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   logging:
     level:
-      org.springframework.web: DEBUG
-      com.mikey.ecommerce: DEBUG
+      org.springframework.web: ${SPRING_WEB_LOG_LEVEL:INFO}
+      com.mikey.ecommerce: ${APP_LOG_LEVEL:INFO}
 
   server:
     error:
-      include
+      include-message: ${SERVER_ERROR_INCLUDE_MESSAGE:never}
+      include-binding-errors: ${SERVER_ERROR_INCLUDE_BINDING_ERRORS:never}
+      include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:never}
 
   application:
     name: ecommerce-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce_db
-    username: ecommerce_user
-    password: ecommerce_pass
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ecommerce_db}
+    username: ${SPRING_DATASOURCE_USERNAME:ecommerce_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:ecommerce_pass}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     open-in-view: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${HIBERNATE_FORMAT_SQL:true}
 
   flyway:
-    enabled: true
+    enabled: ${SPRING_FLYWAY_ENABLED:true}
 
   kafka:
     listener:
-      auto-startup: true
-    bootstrap-servers: localhost:9092
+      auto-startup: ${SPRING_KAFKA_LISTENER_AUTO_STARTUP:true}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     consumer:
-      group-id: ecommerce-group
-      auto-offset-reset: earliest
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID:ecommerce-group}
+      auto-offset-reset: ${SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET:earliest}
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
@@ -50,7 +52,7 @@ spring:
         spring:
           json:
             trusted:
-              packages: "*"
+              packages: ${SPRING_KAFKA_JSON_TRUSTED_PACKAGES:com.mikey.ecommerce.events}
 
 springdoc:
   swagger-ui:
@@ -62,20 +64,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
 
   endpoint:
     health:
-      show-details: always
+      show-details: ${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS:when_authorized}
       probes:
-        enabled: true
+        enabled: ${MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED:true}
 
   health:
     readinessstate:
-      enabled: true
+      enabled: ${MANAGEMENT_HEALTH_READINESSSTATE_ENABLED:true}
     livenessstate:
-      enabled: true
+      enabled: ${MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED:true}
 
 jwt:
-  secret: "change-this-secret-key-to-something-long-and-secure-for-dev-only"
-  expiration-ms: 86400000
+  secret: ${JWT_SECRET:change-this-secret-key-to-something-long-and-secure-for-dev-only}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
