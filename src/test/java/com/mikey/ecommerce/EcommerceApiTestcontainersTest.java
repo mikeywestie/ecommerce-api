@@ -20,11 +20,10 @@ class EcommerceApiTestcontainersTest {
 
     @Container
     static KafkaContainer kafka =
-            static KafkaContainer kafka =
-        new KafkaContainer(
-                DockerImageName.parse("apache/kafka-native:3.8.0")
-                        .asCompatibleSubstituteFor("apache/kafka")
-        );
+            new KafkaContainer(
+                    DockerImageName.parse("apache/kafka-native:3.8.0")
+                            .asCompatibleSubstituteFor("apache/kafka")
+            );
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
