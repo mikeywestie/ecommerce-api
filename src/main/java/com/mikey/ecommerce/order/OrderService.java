@@ -29,19 +29,9 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrders() {
-        return orderRepository.findAll()
+        return orderRepository.findAllWithItems()
                 .stream()
-                .map(order -> new OrderResponse(
-                        order.getId(),
-                        order.getCustomerName(),
-                        order.getCustomerEmail(),
-                        order.getStatus() != null ? order.getStatus().name() : "UNKNOWN",
-                        order.getTotalAmount(),
-                        order.getCouponCode(),
-                        order.getDiscountAmount(),
-                        order.getCreatedAt(),
-                        List.of() // temporarily ignore items
-                ))
+                .map(this::toOrderResponse)
                 .toList();
     }
 
@@ -63,5 +53,34 @@ public class OrderService {
         }
 
         return orderRepository.save(order);
+    }
+
+    private OrderResponse toOrderResponse(CustomerOrder order) {
+        return new OrderResponse(
+                order.getId(),
+                order.getCustomerName(),
+                order.getCustomerEmail(),
+                order.getStatus() != null ? order.getStatus().name() : "UNKNOWN",
+                order.getTotalAmount(),
+                order.getCouponCode(),
+                order.getDiscountAmount(),
+                order.getCreatedAt(),
+                order.getItems()
+                        .stream()
+                        .map(this::toOrderItemResponse)
+                        .toList()
+        );
+    }
+
+    private OrderItemResponse toOrderItemResponse(OrderItem item) {
+        Product product = item.getProduct();
+
+        return new OrderItemResponse(
+                product.getId(),
+                product.getName(),
+                item.getQuantity(),
+                item.getUnitPrice(),
+                item.getLineTotal()
+        );
     }
 }
