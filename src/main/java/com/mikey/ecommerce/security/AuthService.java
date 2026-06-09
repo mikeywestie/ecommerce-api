@@ -70,4 +70,28 @@ public class AuthService {
                 user.getRole().name()
         );
     }
+
+    public AuthResponse registerAdmin(RegisterRequest request) {
+        if (appUserRepository.existsByEmail(request.email())) {
+            throw new ApiException("Email already registered");
+        }
+
+        AppUser user = new AppUser(
+                request.name(),
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                Role.ADMIN
+        );
+
+        AppUser savedUser = appUserRepository.save(user);
+        String token = jwtService.generateToken(savedUser);
+
+        return new AuthResponse(
+                token,
+                "Bearer",
+                savedUser.getEmail(),
+                savedUser.getRole().name()
+        );
+    }
+
 }
