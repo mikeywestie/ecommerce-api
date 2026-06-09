@@ -2,6 +2,9 @@ server:
   port: ${SERVER_PORT:8080}
 
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+
   logging:
     level:
       org.springframework.web: ${SPRING_WEB_LOG_LEVEL:INFO}
