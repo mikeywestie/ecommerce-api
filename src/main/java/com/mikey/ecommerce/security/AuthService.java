@@ -6,14 +6,9 @@ import com.mikey.ecommerce.security.dto.LoginRequest;
 import com.mikey.ecommerce.security.dto.RegisterRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
-
-    private static final String DEMO_ADMIN_NAME = "Admin2";
-    private static final String DEMO_ADMIN_EMAIL = "admin2@ecommerce.local";
-    private static final String DEMO_ADMIN_PASSWORD = "Admin@12345";
 
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
@@ -58,10 +53,7 @@ public class AuthService {
         );
     }
 
-    @Transactional
     public AuthResponse login(LoginRequest request) {
-        ensureDemoAdminExists();
-
         AppUser user = appUserRepository.findByEmail(request.email())
                 .orElseThrow(() -> new ApiException("Invalid email or password"));
 
@@ -100,36 +92,5 @@ public class AuthService {
                 savedUser.getEmail(),
                 savedUser.getRole().name()
         );
-    }
-
-    private void ensureDemoAdminExists() {
-        AppUser demoAdmin = appUserRepository.findByEmail(DEMO_ADMIN_EMAIL)
-                .orElseGet(() -> new AppUser(
-                        DEMO_ADMIN_NAME,
-                        DEMO_ADMIN_EMAIL,
-                        passwordEncoder.encode(DEMO_ADMIN_PASSWORD),
-                        Role.ADMIN
-                ));
-
-        boolean changed = false;
-
-        if (!DEMO_ADMIN_NAME.equals(demoAdmin.getName())) {
-            demoAdmin.setName(DEMO_ADMIN_NAME);
-            changed = true;
-        }
-
-        if (demoAdmin.getRole() != Role.ADMIN) {
-            demoAdmin.setRole(Role.ADMIN);
-            changed = true;
-        }
-
-        if (!passwordEncoder.matches(DEMO_ADMIN_PASSWORD, demoAdmin.getPassword())) {
-            demoAdmin.setPassword(passwordEncoder.encode(DEMO_ADMIN_PASSWORD));
-            changed = true;
-        }
-
-        if (demoAdmin.getId() == null || changed) {
-            appUserRepository.save(demoAdmin);
-        }
     }
 }
