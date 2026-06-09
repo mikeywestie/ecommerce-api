@@ -214,6 +214,9 @@ public class ProductController {
                 new Product(
                         request.name(),
                         request.description(),
+                        request.category(),
+                        request.imageUrl(),
+                        request.active() == null || request.active(),
                         request.price()
                 )
         );
@@ -262,6 +265,9 @@ public class ProductController {
         product.update(
                 request.name(),
                 request.description(),
+                request.category(),
+                request.imageUrl(),
+                request.active() == null || request.active(),
                 request.price()
         );
 

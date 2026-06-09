@@ -113,6 +113,9 @@ class ProductControllerTest {
         ProductRequest request = new ProductRequest(
                 "Mechanical Keyboard",
                 "RGB keyboard",
+                "Peripherals",
+                "https://example.com/keyboard.jpg",
+                true,
                 new BigDecimal("1299.99"),
                 10
         );
@@ -147,6 +150,9 @@ class ProductControllerTest {
         ProductRequest request = new ProductRequest(
                 "",
                 "RGB keyboard",
+                "Peripherals",
+                "https://example.com/keyboard.jpg",
+                true,
                 new BigDecimal("1299.99"),
                 10
         );
@@ -172,6 +178,9 @@ class ProductControllerTest {
         ProductRequest request = new ProductRequest(
                 "Mechanical Keyboard",
                 "RGB keyboard",
+                "Peripherals",
+                "https://example.com/keyboard.jpg",
+                true,
                 new BigDecimal("1299.99"),
                 null
         );
@@ -218,7 +227,15 @@ class ProductControllerTest {
             String description,
             BigDecimal price
     ) {
-        Product product = new Product(name, description, price);
+        Product product = new Product(
+                name,
+                description,
+                "Peripherals",
+                "https://example.com/product.jpg",
+                true,
+                price
+        );
+
         setField(product, "id", id);
         return product;
     }

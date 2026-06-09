@@ -257,7 +257,15 @@ class CartServiceTest {
             String description,
             BigDecimal price
     ) {
-        Product product = new Product(name, description, price);
+        Product product = new Product(
+                name,
+                description,
+                "Peripherals",
+                "https://example.com/product.jpg",
+                true,
+                price
+        );
+
         setField(product, "id", id);
         return product;
     }

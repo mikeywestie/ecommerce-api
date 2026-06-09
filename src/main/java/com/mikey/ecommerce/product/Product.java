@@ -26,6 +26,15 @@ public class Product {
 
     private String description;
 
+    @Column(nullable = false)
+    private String category;
+
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
     @PositiveOrZero
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
@@ -41,43 +50,53 @@ public class Product {
     protected Product() {
     }
 
-    public Product(String name,
-                   String description,
-                   BigDecimal price) {
+    public Product(
+            String name,
+            String description,
+            String category,
+            String imageUrl,
+            boolean active,
+            BigDecimal price
+    ) {
         this.name = name;
         this.description = description;
+        this.category = category;
+        this.imageUrl = imageUrl;
+        this.active = active;
         this.price = price;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+    public String getCategory() { return category; }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+    public String getImageUrl() { return imageUrl; }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
+    public boolean isActive() { return active; }
 
-    public void update(String name,
-                       String description,
-                       BigDecimal price) {
+    public BigDecimal getPrice() { return price; }
+
+    public Instant getCreatedAt() { return createdAt; }
+
+    public Instant getUpdatedAt() { return updatedAt; }
+
+    public void update(
+            String name,
+            String description,
+            String category,
+            String imageUrl,
+            boolean active,
+            BigDecimal price
+    ) {
         this.name = name;
         this.description = description;
+        this.category = category;
+        this.imageUrl = imageUrl;
+        this.active = active;
         this.price = price;
     }
 }

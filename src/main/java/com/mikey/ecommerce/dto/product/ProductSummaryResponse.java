@@ -5,5 +5,8 @@ import java.math.BigDecimal;
 public record ProductSummaryResponse(
         Long id,
         String name,
+        String category,
+        String imageUrl,
+        boolean active,
         BigDecimal price
 ) {}
