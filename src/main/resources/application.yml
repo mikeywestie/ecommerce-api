@@ -94,6 +94,8 @@ management:
 app:
   cors:
     allowed-origins: http://localhost:5173,http://localhost:5174
+  events:
+    kafka-enabled: ${APP_EVENTS_KAFKA_ENABLED:false}
 
 jwt:
   secret: ${JWT_SECRET:this-is-my-super-secret-local-development-key-123456}

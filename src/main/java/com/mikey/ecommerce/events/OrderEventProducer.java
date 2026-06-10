@@ -2,6 +2,7 @@ package com.mikey.ecommerce.events;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,14 @@ public class OrderEventProducer {
     private static final String COUPON_APPLIED_TOPIC = "coupon-applied";
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final boolean kafkaEnabled;
 
-    public OrderEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+    public OrderEventProducer(
+            KafkaTemplate<String, Object> kafkaTemplate,
+            @Value("${app.events.kafka-enabled:false}") boolean kafkaEnabled
+    ) {
         this.kafkaTemplate = kafkaTemplate;
+        this.kafkaEnabled = kafkaEnabled;
     }
 
     public void publish(PaymentProcessedEvent event) {
@@ -46,6 +52,15 @@ public class OrderEventProducer {
     }
 
     private void publishSafely(String topic, String key, Object event) {
+        if (!kafkaEnabled) {
+            log.info(
+                    "Kafka publishing disabled. Skipping event topic={} key={}",
+                    topic,
+                    key
+            );
+            return;
+        }
+
         try {
             kafkaTemplate.send(topic, key, event)
                     .whenComplete((result, ex) -> {
