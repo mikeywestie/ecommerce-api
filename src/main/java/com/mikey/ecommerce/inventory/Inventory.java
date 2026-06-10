@@ -16,11 +16,7 @@ public class Inventory {
     private Long version;
 
     @OneToOne(optional = false)
-    @JoinColumn(
-            name = "product_id",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "product_id", nullable = false, unique = true)
     private Product product;
 
     @Column(nullable = false)
@@ -30,25 +26,18 @@ public class Inventory {
     }
 
     public Inventory(Product product, int quantityAvailable) {
+        if (quantityAvailable < 0) {
+            throw new ApiException("Quantity cannot be negative");
+        }
+
         this.product = product;
         this.quantityAvailable = quantityAvailable;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public int getQuantityAvailable() {
-        return quantityAvailable;
-    }
+    public Long getId() { return id; }
+    public Long getVersion() { return version; }
+    public Product getProduct() { return product; }
+    public int getQuantityAvailable() { return quantityAvailable; }
 
     public void addStock(int quantity) {
         if (quantity < 0) {
@@ -58,18 +47,21 @@ public class Inventory {
         this.quantityAvailable += quantity;
     }
 
+    public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new ApiException("Quantity cannot be negative");
+        }
+
+        this.quantityAvailable = quantity;
+    }
+
     public void reserve(int quantity) {
         if (quantity <= 0) {
-            throw new ApiException(
-                    "Quantity must be greater than zero"
-            );
+            throw new ApiException("Quantity must be greater than zero");
         }
 
         if (quantityAvailable < quantity) {
-            throw new ApiException(
-                    "Not enough stock for product: "
-                            + product.getName()
-            );
+            throw new ApiException("Not enough stock for product: " + product.getName());
         }
 
         quantityAvailable -= quantity;

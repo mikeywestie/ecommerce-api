@@ -199,18 +199,29 @@ class ProductControllerTest {
     }
 
     @Test
-    void delete_shouldDeleteProductWhenItExists() throws Exception {
-        when(productRepository.existsById(1L)).thenReturn(true);
+    void delete_shouldMarkProductInactiveWhenItExists() throws Exception {
+        Product product = productWithId(
+                1L,
+                "Mechanical Keyboard",
+                "RGB keyboard",
+                new BigDecimal("1299.99")
+        );
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(product)).thenReturn(product);
 
         mockMvc.perform(delete("/api/products/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.active").value(false));
 
-        verify(productRepository).deleteById(1L);
+        verify(productRepository).save(product);
+        assertThat(product.isActive()).isFalse();
     }
 
     @Test
     void delete_shouldThrowExceptionWhenProductDoesNotExist() {
-        when(productRepository.existsById(99L)).thenReturn(false);
+        when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
                 mockMvc.perform(delete("/api/products/99"))
@@ -218,7 +229,7 @@ class ProductControllerTest {
                 .hasRootCauseInstanceOf(ApiException.class)
                 .hasMessageContaining("Product not found");
 
-        verify(productRepository, never()).deleteById(anyLong());
+        verify(productRepository, never()).save(any());
     }
 
     private Product productWithId(

@@ -67,21 +67,13 @@ public class Product {
     }
 
     public Long getId() { return id; }
-
     public String getName() { return name; }
-
     public String getDescription() { return description; }
-
     public String getCategory() { return category; }
-
     public String getImageUrl() { return imageUrl; }
-
     public boolean isActive() { return active; }
-
     public BigDecimal getPrice() { return price; }
-
     public Instant getCreatedAt() { return createdAt; }
-
     public Instant getUpdatedAt() { return updatedAt; }
 
     public void update(
@@ -98,5 +90,9 @@ public class Product {
         this.imageUrl = imageUrl;
         this.active = active;
         this.price = price;
+    }
+
+    public void deactivate() {
+        this.active = false;
     }
 }
