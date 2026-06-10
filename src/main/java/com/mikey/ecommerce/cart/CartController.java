@@ -71,4 +71,9 @@ public class CartController {
     ) {
         return cartService.applyCoupon(authentication.getName(), code);
     }
+
+    @DeleteMapping("/coupon")
+    public CartResponse removeCoupon(Authentication authentication) {
+        return cartService.removeCoupon(authentication.getName());
+    }
 }

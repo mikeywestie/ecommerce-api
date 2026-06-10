@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -214,6 +215,15 @@ public class CartService {
         return toResponse(cartRepository.save(cart));
     }
 
+    public CartResponse removeCoupon(String userEmail) {
+        AppUser user = findUser(userEmail);
+        Cart cart = getExistingCart(user);
+
+        cart.applyCoupon(null);
+
+        return toResponse(cartRepository.save(cart));
+    }
+
     private void validateCartStock(Cart cart) {
         for (CartItem item : cart.getItems()) {
             Inventory inventory = inventoryRepository
@@ -284,19 +294,26 @@ public class CartService {
         BigDecimal subtotal =
                 items.stream()
                         .map(CartItemResponse::lineTotal)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .setScale(2, RoundingMode.HALF_UP);
 
-        BigDecimal total = subtotal;
+        BigDecimal discount =
+                calculateDiscount(cart, subtotal)
+                        .setScale(2, RoundingMode.HALF_UP);
 
-        if (cart.getCoupon() != null) {
-            total = subtotal.subtract(calculateDiscount(cart, subtotal));
+        BigDecimal total =
+                subtotal.subtract(discount)
+                        .max(BigDecimal.ZERO)
+                        .setScale(2, RoundingMode.HALF_UP);
 
-            if (total.signum() < 0) {
-                total = BigDecimal.ZERO;
-            }
-        }
-
-        return new CartResponse(cart.getId(), items, total);
+        return new CartResponse(
+                cart.getId(),
+                items,
+                subtotal,
+                discount,
+                total,
+                cart.getCoupon() == null ? null : cart.getCoupon().getCode()
+        );
     }
 
     private CartItemResponse toCartItemResponse(CartItem item) {
@@ -376,9 +393,9 @@ public class CartService {
         }
 
         if (cart.getCoupon().getType().name().equals("PERCENTAGE")) {
-            return subtotal.multiply(
-                    cart.getCoupon().getValue().divide(BigDecimal.valueOf(100))
-            );
+            return subtotal
+                    .multiply(cart.getCoupon().getValue())
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         }
 
         BigDecimal discount = cart.getCoupon().getValue();

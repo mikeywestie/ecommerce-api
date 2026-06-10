@@ -6,5 +6,8 @@ import java.util.List;
 public record CartResponse(
         Long cartId,
         List<CartItemResponse> items,
-        BigDecimal total
+        BigDecimal subtotal,
+        BigDecimal discount,
+        BigDecimal total,
+        String couponCode
 ) {}
