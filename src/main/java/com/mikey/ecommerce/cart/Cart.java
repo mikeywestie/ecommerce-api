@@ -37,32 +37,26 @@ public class Cart {
         this.user = user;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public AppUser getUser() {
-        return user;
-    }
+    public AppUser getUser() { return user; }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+    public Instant getCreatedAt() { return createdAt; }
 
-    public List<CartItem> getItems() {
-        return items;
-    }
+    public List<CartItem> getItems() { return items; }
+
+    public Coupon getCoupon() { return coupon; }
 
     public void addItem(CartItem item) {
         this.items.add(item);
     }
 
-    public void clear() {
-        this.items.clear();
+    public void removeItem(CartItem item) {
+        this.items.remove(item);
     }
 
-    public Coupon getCoupon() {
-        return coupon;
+    public void clear() {
+        this.items.clear();
     }
 
     public void applyCoupon(Coupon coupon) {

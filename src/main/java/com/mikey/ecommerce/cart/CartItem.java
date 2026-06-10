@@ -1,6 +1,7 @@
 package com.mikey.ecommerce.cart;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.product.Product;
 import jakarta.persistence.*;
 
@@ -30,32 +31,32 @@ public class CartItem {
     }
 
     public CartItem(Cart cart, Product product, int quantity) {
+        if (quantity <= 0) {
+            throw new ApiException("Quantity must be greater than zero");
+        }
+
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public Cart getCart() {
-        return cart;
-    }
+    public Cart getCart() { return cart; }
 
-    public Product getProduct() {
-        return product;
-    }
+    public Product getProduct() { return product; }
 
-    public int getQuantity() {
-        return quantity;
-    }
+    public int getQuantity() { return quantity; }
 
     public BigDecimal getLineTotal() {
         return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 
     public void updateQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new ApiException("Quantity must be greater than zero");
+        }
+
         this.quantity = quantity;
     }
 }
