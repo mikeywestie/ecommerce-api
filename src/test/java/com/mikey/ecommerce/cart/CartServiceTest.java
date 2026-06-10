@@ -6,6 +6,7 @@ import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.coupon.Coupon;
 import com.mikey.ecommerce.coupon.CouponRepository;
 import com.mikey.ecommerce.coupon.CouponType;
+import com.mikey.ecommerce.coupon.CouponRedemptionRepository;
 import com.mikey.ecommerce.events.OrderEventProducer;
 import com.mikey.ecommerce.inventory.Inventory;
 import com.mikey.ecommerce.inventory.InventoryRepository;
@@ -59,6 +60,9 @@ class CartServiceTest {
     private CouponRepository couponRepository;
 
     @Mock
+    private CouponRedemptionRepository couponRedemptionRepository;
+
+    @Mock
     private OrderEventProducer orderEventProducer;
 
     private CartService cartService;
@@ -73,6 +77,7 @@ class CartServiceTest {
                 orderService,
                 paymentService,
                 couponRepository,
+                couponRedemptionRepository,
                 orderEventProducer
         );
     }

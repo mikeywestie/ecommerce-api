@@ -11,5 +11,9 @@ public record CouponResponse(
         CouponType type,
         BigDecimal value,
         boolean active,
-        Instant expiresAt
+        Instant expiresAt,
+        boolean reusable,
+        Integer maxUsesPerCustomer,
+        Integer maxTotalUses,
+        long totalRedemptions
 ) {}

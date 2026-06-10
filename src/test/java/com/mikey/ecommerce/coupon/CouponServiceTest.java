@@ -2,6 +2,7 @@ package com.mikey.ecommerce.coupon;
 
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.coupon.dto.CouponResponse;
+import com.mikey.ecommerce.coupon.CouponRedemptionRepository;
 import com.mikey.ecommerce.coupon.dto.CreateCouponRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,17 @@ class CouponServiceTest {
     @Mock
     private CouponRepository couponRepository;
 
+    @Mock
+    private CouponRedemptionRepository couponRedemptionRepository;
+
     private CouponService couponService;
 
     @BeforeEach
     void setUp() {
-        couponService = new CouponService(couponRepository);
+        couponService = new CouponService(
+                couponRepository,
+                couponRedemptionRepository
+        );
     }
 
     @Test
@@ -42,7 +49,10 @@ class CouponServiceTest {
                 "save10",
                 CouponType.PERCENTAGE,
                 new BigDecimal("10.00"),
-                expiresAt
+                expiresAt,
+                true,
+                null,
+                null
         );
 
         when(couponRepository.existsByCodeIgnoreCase("save10")).thenReturn(false);
@@ -51,6 +61,9 @@ class CouponServiceTest {
             setField(coupon, "id", 1L);
             return coupon;
         });
+
+        when(couponRedemptionRepository.countByCoupon(any()))
+                .thenReturn(0L);
 
         CouponResponse response = couponService.create(request);
 
@@ -77,7 +90,10 @@ class CouponServiceTest {
                 "SAVE10",
                 CouponType.PERCENTAGE,
                 new BigDecimal("10.00"),
-                expiresAt
+                expiresAt,
+                true,
+                null,
+                null
         );
 
         when(couponRepository.existsByCodeIgnoreCase("SAVE10")).thenReturn(true);
@@ -112,6 +128,11 @@ class CouponServiceTest {
         secondCoupon.deactivate();
 
         when(couponRepository.findAll()).thenReturn(List.of(firstCoupon, secondCoupon));
+        when(couponRedemptionRepository.countByCoupon(firstCoupon))
+                .thenReturn(5L);
+
+        when(couponRedemptionRepository.countByCoupon(secondCoupon))
+                .thenReturn(2L);
 
         List<CouponResponse> responses = couponService.findAll();
 

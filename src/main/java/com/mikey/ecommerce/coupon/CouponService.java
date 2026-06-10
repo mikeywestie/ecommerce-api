@@ -11,9 +11,14 @@ import java.util.List;
 public class CouponService {
 
     private final CouponRepository couponRepository;
+    private final CouponRedemptionRepository couponRedemptionRepository;
 
-    public CouponService(CouponRepository couponRepository) {
+    public CouponService(
+            CouponRepository couponRepository,
+            CouponRedemptionRepository couponRedemptionRepository
+    ) {
         this.couponRepository = couponRepository;
+        this.couponRedemptionRepository = couponRedemptionRepository;
     }
 
     public CouponResponse create(CreateCouponRequest request) {
@@ -21,11 +26,16 @@ public class CouponService {
             throw new ApiException("Coupon code already exists");
         }
 
+        boolean reusable = request.reusable() == null || request.reusable();
+
         Coupon coupon = new Coupon(
                 request.code(),
                 request.type(),
                 request.value(),
-                request.expiresAt()
+                request.expiresAt(),
+                reusable,
+                request.maxUsesPerCustomer(),
+                request.maxTotalUses()
         );
 
         return toResponse(couponRepository.save(coupon));
@@ -45,7 +55,11 @@ public class CouponService {
                 coupon.getType(),
                 coupon.getValue(),
                 coupon.isActive(),
-                coupon.getExpiresAt()
+                coupon.getExpiresAt(),
+                coupon.isReusable(),
+                coupon.getMaxUsesPerCustomer(),
+                coupon.getMaxTotalUses(),
+                couponRedemptionRepository.countByCoupon(coupon)
         );
     }
 }

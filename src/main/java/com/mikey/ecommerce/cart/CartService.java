@@ -5,6 +5,8 @@ import com.mikey.ecommerce.cart.dto.CartItemResponse;
 import com.mikey.ecommerce.cart.dto.CartResponse;
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.coupon.Coupon;
+import com.mikey.ecommerce.coupon.CouponRedemption;
+import com.mikey.ecommerce.coupon.CouponRedemptionRepository;
 import com.mikey.ecommerce.coupon.CouponRepository;
 import com.mikey.ecommerce.dto.order.OrderResponse;
 import com.mikey.ecommerce.events.CouponAppliedEvent;
@@ -43,6 +45,7 @@ public class CartService {
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final CouponRepository couponRepository;
+    private final CouponRedemptionRepository couponRedemptionRepository;
     private final OrderEventProducer orderEventProducer;
 
     public CartService(
@@ -53,6 +56,7 @@ public class CartService {
             OrderService orderService,
             PaymentService paymentService,
             CouponRepository couponRepository,
+            CouponRedemptionRepository couponRedemptionRepository,
             OrderEventProducer orderEventProducer
     ) {
         this.cartRepository = cartRepository;
@@ -62,6 +66,7 @@ public class CartService {
         this.orderService = orderService;
         this.paymentService = paymentService;
         this.couponRepository = couponRepository;
+        this.couponRedemptionRepository = couponRedemptionRepository;
         this.orderEventProducer = orderEventProducer;
     }
 
@@ -135,6 +140,10 @@ public class CartService {
 
         validateCartStock(cart);
 
+        if (cart.getCoupon() != null) {
+            validateCouponUsage(cart.getCoupon(), user);
+        }
+
         List<OrderItemRequest> orderItems =
                 cart.getItems()
                         .stream()
@@ -165,6 +174,10 @@ public class CartService {
 
         if (cart.getCoupon() != null) {
             order.applyDiscount(cart.getCoupon().getCode(), discount);
+
+            couponRedemptionRepository.save(
+                    new CouponRedemption(cart.getCoupon(), user, order)
+            );
 
             orderEventProducer.publish(
                     new CouponAppliedEvent(
@@ -202,13 +215,8 @@ public class CartService {
                 .findByCodeIgnoreCase(code)
                 .orElseThrow(() -> new ApiException("Coupon not found"));
 
-        if (!coupon.isActive()) {
-            throw new ApiException("Coupon inactive");
-        }
-
-        if (coupon.isExpired()) {
-            throw new ApiException("Coupon expired");
-        }
+        validateCouponAvailability(coupon);
+        validateCouponUsage(coupon, user);
 
         cart.applyCoupon(coupon);
 
@@ -222,6 +230,43 @@ public class CartService {
         cart.applyCoupon(null);
 
         return toResponse(cartRepository.save(cart));
+    }
+
+    private void validateCouponAvailability(Coupon coupon) {
+        if (!coupon.isActive()) {
+            throw new ApiException("Coupon inactive");
+        }
+
+        if (coupon.isExpired()) {
+            throw new ApiException("Coupon expired");
+        }
+    }
+
+    private void validateCouponUsage(Coupon coupon, AppUser user) {
+        if (coupon.isReusable()
+                && coupon.getMaxUsesPerCustomer() == null
+                && coupon.getMaxTotalUses() == null) {
+            return;
+        }
+
+        long totalUses = couponRedemptionRepository.countByCoupon(coupon);
+
+        if (coupon.getMaxTotalUses() != null
+                && totalUses >= coupon.getMaxTotalUses()) {
+            throw new ApiException("Coupon total usage limit reached");
+        }
+
+        long customerUses =
+                couponRedemptionRepository.countByCouponAndUser(coupon, user);
+
+        if (!coupon.isReusable() && customerUses > 0) {
+            throw new ApiException("Coupon already used by this customer");
+        }
+
+        if (coupon.getMaxUsesPerCustomer() != null
+                && customerUses >= coupon.getMaxUsesPerCustomer()) {
+            throw new ApiException("Coupon usage limit reached for this customer");
+        }
     }
 
     private void validateCartStock(Cart cart) {

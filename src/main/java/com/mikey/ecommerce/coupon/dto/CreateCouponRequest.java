@@ -3,6 +3,7 @@ package com.mikey.ecommerce.coupon.dto;
 import com.mikey.ecommerce.coupon.CouponType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,5 +14,8 @@ public record CreateCouponRequest(
         @NotBlank String code,
         @NotNull CouponType type,
         @NotNull @DecimalMin("0.01") BigDecimal value,
-        @NotNull @Future Instant expiresAt
+        @NotNull @Future Instant expiresAt,
+        Boolean reusable,
+        @Min(1) Integer maxUsesPerCustomer,
+        @Min(1) Integer maxTotalUses
 ) {}
