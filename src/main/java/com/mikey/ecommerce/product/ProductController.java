@@ -88,7 +88,12 @@ public class ProductController {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException("Product not found"));
 
-        return ProductMapper.toResponse(product);
+        int availableQuantity = inventoryRepository
+                .findByProductId(product.getId())
+                .map(Inventory::getQuantityAvailable)
+                .orElse(0);
+
+        return ProductMapper.toResponse(product, availableQuantity);
     }
 
     @PostMapping
@@ -109,7 +114,7 @@ public class ProductController {
 
         inventoryRepository.save(new Inventory(product, initialStock));
 
-        return ProductMapper.toResponse(product);
+        return ProductMapper.toResponse(product, initialStock);
     }
 
     @PutMapping("/{id}")
@@ -129,7 +134,14 @@ public class ProductController {
                 request.price()
         );
 
-        return ProductMapper.toResponse(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+
+        int availableQuantity = inventoryRepository
+                .findByProductId(savedProduct.getId())
+                .map(Inventory::getQuantityAvailable)
+                .orElse(0);
+
+        return ProductMapper.toResponse(savedProduct, availableQuantity);
     }
 
     @DeleteMapping("/{id}")
@@ -139,7 +151,14 @@ public class ProductController {
 
         product.deactivate();
 
-        return ProductMapper.toResponse(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+
+        int availableQuantity = inventoryRepository
+                .findByProductId(savedProduct.getId())
+                .map(Inventory::getQuantityAvailable)
+                .orElse(0);
+
+        return ProductMapper.toResponse(savedProduct, availableQuantity);
     }
 
     private void validatePaginationAndSorting(

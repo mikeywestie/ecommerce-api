@@ -11,5 +11,8 @@ public record ProductResponse(
         String imageUrl,
         boolean active,
         BigDecimal price,
+        Integer availableQuantity,
+        String stockStatus,
+        String stockMessage,
         Instant createdAt
 ) {}
