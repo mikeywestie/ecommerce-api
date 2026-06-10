@@ -7,7 +7,10 @@ import com.mikey.ecommerce.coupon.Coupon;
 import com.mikey.ecommerce.coupon.CouponRepository;
 import com.mikey.ecommerce.coupon.CouponType;
 import com.mikey.ecommerce.events.OrderEventProducer;
+import com.mikey.ecommerce.inventory.Inventory;
+import com.mikey.ecommerce.inventory.InventoryRepository;
 import com.mikey.ecommerce.order.OrderService;
+import com.mikey.ecommerce.payment.PaymentService;
 import com.mikey.ecommerce.product.Product;
 import com.mikey.ecommerce.product.ProductRepository;
 import com.mikey.ecommerce.security.AppUser;
@@ -41,10 +44,16 @@ class CartServiceTest {
     private ProductRepository productRepository;
 
     @Mock
+    private InventoryRepository inventoryRepository;
+
+    @Mock
     private AppUserRepository appUserRepository;
 
     @Mock
     private OrderService orderService;
+
+    @Mock
+    private PaymentService paymentService;
 
     @Mock
     private CouponRepository couponRepository;
@@ -59,8 +68,10 @@ class CartServiceTest {
         cartService = new CartService(
                 cartRepository,
                 productRepository,
+                inventoryRepository,
                 appUserRepository,
                 orderService,
+                paymentService,
                 couponRepository,
                 orderEventProducer
         );
@@ -80,6 +91,8 @@ class CartServiceTest {
                 .thenReturn(Optional.of(user));
         when(productRepository.findById(1L))
                 .thenReturn(Optional.of(product));
+        when(inventoryRepository.findByProductId(1L))
+                .thenReturn(Optional.of(new Inventory(product, 20)));
         when(cartRepository.findByUser(user))
                 .thenReturn(Optional.empty());
         when(cartRepository.save(any(Cart.class)))
@@ -101,6 +114,8 @@ class CartServiceTest {
         assertThat(response.items().get(0).quantity()).isEqualTo(2);
         assertThat(response.items().get(0).unitPrice()).isEqualByComparingTo("1299.99");
         assertThat(response.items().get(0).lineTotal()).isEqualByComparingTo("2599.98");
+        assertThat(response.items().get(0).availableQuantity()).isEqualTo(20);
+        assertThat(response.items().get(0).stockStatus()).isEqualTo("IN_STOCK");
         assertThat(response.total()).isEqualByComparingTo("2599.98");
     }
 
@@ -120,6 +135,8 @@ class CartServiceTest {
                 .thenReturn(Optional.of(user));
         when(productRepository.findById(1L))
                 .thenReturn(Optional.of(product));
+        when(inventoryRepository.findByProductId(1L))
+                .thenReturn(Optional.of(new Inventory(product, 20)));
         when(cartRepository.findByUser(user))
                 .thenReturn(Optional.of(cart));
         when(cartRepository.save(cart)).thenReturn(cart);
@@ -132,6 +149,8 @@ class CartServiceTest {
         assertThat(response.items()).hasSize(1);
         assertThat(response.items().get(0).quantity()).isEqualTo(5);
         assertThat(response.items().get(0).lineTotal()).isEqualByComparingTo("6499.95");
+        assertThat(response.items().get(0).availableQuantity()).isEqualTo(20);
+        assertThat(response.items().get(0).stockStatus()).isEqualTo("IN_STOCK");
         assertThat(response.total()).isEqualByComparingTo("6499.95");
     }
 
@@ -191,6 +210,8 @@ class CartServiceTest {
 
         when(appUserRepository.findByEmail("michael@example.com"))
                 .thenReturn(Optional.of(user));
+        when(inventoryRepository.findByProductId(1L))
+                .thenReturn(Optional.of(new Inventory(product, 20)));
         when(cartRepository.findByUser(user))
                 .thenReturn(Optional.of(cart));
         when(couponRepository.findByCodeIgnoreCase("SAVE10"))

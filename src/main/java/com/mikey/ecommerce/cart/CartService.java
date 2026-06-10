@@ -10,11 +10,14 @@ import com.mikey.ecommerce.dto.order.OrderResponse;
 import com.mikey.ecommerce.events.CouponAppliedEvent;
 import com.mikey.ecommerce.events.OrderCreatedEvent;
 import com.mikey.ecommerce.events.OrderEventProducer;
+import com.mikey.ecommerce.inventory.Inventory;
+import com.mikey.ecommerce.inventory.InventoryRepository;
 import com.mikey.ecommerce.mapper.OrderMapper;
 import com.mikey.ecommerce.order.CreateOrderRequest;
 import com.mikey.ecommerce.order.CustomerOrder;
 import com.mikey.ecommerce.order.OrderItemRequest;
 import com.mikey.ecommerce.order.OrderService;
+import com.mikey.ecommerce.payment.PaymentService;
 import com.mikey.ecommerce.product.Product;
 import com.mikey.ecommerce.product.ProductRepository;
 import com.mikey.ecommerce.security.AppUser;
@@ -29,25 +32,34 @@ import java.util.List;
 @Transactional
 public class CartService {
 
+    private static final int LOW_STOCK_THRESHOLD = 5;
+    private static final int ALMOST_SOLD_OUT_THRESHOLD = 10;
+
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final InventoryRepository inventoryRepository;
     private final AppUserRepository appUserRepository;
     private final OrderService orderService;
+    private final PaymentService paymentService;
     private final CouponRepository couponRepository;
     private final OrderEventProducer orderEventProducer;
 
     public CartService(
             CartRepository cartRepository,
             ProductRepository productRepository,
+            InventoryRepository inventoryRepository,
             AppUserRepository appUserRepository,
             OrderService orderService,
+            PaymentService paymentService,
             CouponRepository couponRepository,
             OrderEventProducer orderEventProducer
     ) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
+        this.inventoryRepository = inventoryRepository;
         this.appUserRepository = appUserRepository;
         this.orderService = orderService;
+        this.paymentService = paymentService;
         this.couponRepository = couponRepository;
         this.orderEventProducer = orderEventProducer;
     }
@@ -120,6 +132,8 @@ public class CartService {
             throw new ApiException("Cart is empty");
         }
 
+        validateCartStock(cart);
+
         List<OrderItemRequest> orderItems =
                 cart.getItems()
                         .stream()
@@ -161,6 +175,8 @@ public class CartService {
             );
         }
 
+        paymentService.processPaymentForOrder(order, "DEMO_CARD");
+
         orderEventProducer.publish(
                 new OrderCreatedEvent(
                         order.getId(),
@@ -198,6 +214,40 @@ public class CartService {
         return toResponse(cartRepository.save(cart));
     }
 
+    private void validateCartStock(Cart cart) {
+        for (CartItem item : cart.getItems()) {
+            Inventory inventory = inventoryRepository
+                    .findByProductId(item.getProduct().getId())
+                    .orElseThrow(() -> new ApiException(
+                            "Inventory not found for product: "
+                                    + item.getProduct().getName()
+                    ));
+
+            if (!item.getProduct().isActive()) {
+                throw new ApiException(
+                        item.getProduct().getName()
+                                + " is no longer available"
+                );
+            }
+
+            if (inventory.getQuantityAvailable() <= 0) {
+                throw new ApiException(
+                        item.getProduct().getName()
+                                + " is out of stock"
+                );
+            }
+
+            if (inventory.getQuantityAvailable() < item.getQuantity()) {
+                throw new ApiException(
+                        "Only "
+                                + inventory.getQuantityAvailable()
+                                + " left for "
+                                + item.getProduct().getName()
+                );
+            }
+        }
+    }
+
     private AppUser findUser(String email) {
         return appUserRepository
                 .findByEmail(email)
@@ -228,16 +278,7 @@ public class CartService {
         List<CartItemResponse> items =
                 cart.getItems()
                         .stream()
-                        .map(item ->
-                                new CartItemResponse(
-                                        item.getId(),
-                                        item.getProduct().getId(),
-                                        item.getProduct().getName(),
-                                        item.getQuantity(),
-                                        item.getProduct().getPrice(),
-                                        item.getLineTotal()
-                                )
-                        )
+                        .map(this::toCartItemResponse)
                         .toList();
 
         BigDecimal subtotal =
@@ -256,6 +297,77 @@ public class CartService {
         }
 
         return new CartResponse(cart.getId(), items, total);
+    }
+
+    private CartItemResponse toCartItemResponse(CartItem item) {
+        Inventory inventory = inventoryRepository
+                .findByProductId(item.getProduct().getId())
+                .orElse(null);
+
+        int availableQuantity =
+                inventory == null ? 0 : inventory.getQuantityAvailable();
+
+        String stockStatus = resolveStockStatus(
+                item,
+                availableQuantity
+        );
+
+        return new CartItemResponse(
+                item.getId(),
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getProduct().getPrice(),
+                item.getLineTotal(),
+                availableQuantity,
+                stockStatus,
+                resolveStockMessage(item, availableQuantity, stockStatus)
+        );
+    }
+
+    private String resolveStockStatus(
+            CartItem item,
+            int availableQuantity
+    ) {
+        if (!item.getProduct().isActive()) {
+            return "INACTIVE";
+        }
+
+        if (availableQuantity <= 0) {
+            return "OUT_OF_STOCK";
+        }
+
+        if (availableQuantity < item.getQuantity()) {
+            return "INSUFFICIENT_STOCK";
+        }
+
+        if (availableQuantity <= LOW_STOCK_THRESHOLD) {
+            return "LOW_STOCK";
+        }
+
+        if (availableQuantity <= ALMOST_SOLD_OUT_THRESHOLD) {
+            return "ALMOST_SOLD_OUT";
+        }
+
+        return "IN_STOCK";
+    }
+
+    private String resolveStockMessage(
+            CartItem item,
+            int availableQuantity,
+            String stockStatus
+    ) {
+        return switch (stockStatus) {
+            case "INACTIVE" -> "Product is no longer available.";
+            case "OUT_OF_STOCK" -> "Out of stock.";
+            case "INSUFFICIENT_STOCK" ->
+                    "Only " + availableQuantity + " left in stock.";
+            case "LOW_STOCK" ->
+                    "Low stock. " + availableQuantity + " left.";
+            case "ALMOST_SOLD_OUT" ->
+                    "Almost sold out. " + availableQuantity + " left.";
+            default -> "In stock.";
+        };
     }
 
     private BigDecimal calculateDiscount(Cart cart, BigDecimal subtotal) {

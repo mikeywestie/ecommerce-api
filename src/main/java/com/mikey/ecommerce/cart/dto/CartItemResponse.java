@@ -8,5 +8,8 @@ public record CartItemResponse(
         String productName,
         int quantity,
         BigDecimal unitPrice,
-        BigDecimal lineTotal
+        BigDecimal lineTotal,
+        int availableQuantity,
+        String stockStatus,
+        String stockMessage
 ) {}

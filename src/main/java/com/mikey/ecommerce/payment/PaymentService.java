@@ -16,7 +16,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderEventProducer orderEventProducer;
 
-    public PaymentService(OrderRepository orderRepository, PaymentRepository paymentRepository, OrderEventProducer orderEventProducer) {
+    public PaymentService(
+            OrderRepository orderRepository,
+            PaymentRepository paymentRepository,
+            OrderEventProducer orderEventProducer
+    ) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.orderEventProducer = orderEventProducer;
@@ -27,6 +31,14 @@ public class PaymentService {
         CustomerOrder order = orderRepository.findById(request.orderId())
                 .orElseThrow(() -> new ApiException("Order not found"));
 
+        return processPaymentForOrder(order, request.paymentMethod());
+    }
+
+    @Transactional
+    public Payment processPaymentForOrder(
+            CustomerOrder order,
+            String paymentMethod
+    ) {
         if (paymentRepository.findByOrderId(order.getId()).isPresent()) {
             throw new ApiException("Payment already exists for this order");
         }
@@ -35,7 +47,7 @@ public class PaymentService {
             throw new ApiException("Only CREATED orders can be paid");
         }
 
-        boolean success = !"FAIL".equalsIgnoreCase(request.paymentMethod());
+        boolean success = !"FAIL".equalsIgnoreCase(paymentMethod);
 
         if (success) {
             order.markPaid();
@@ -45,7 +57,7 @@ public class PaymentService {
 
         Payment payment = new Payment(
                 order,
-                request.paymentMethod(),
+                paymentMethod,
                 success ? PaymentStatus.SUCCESS : PaymentStatus.FAILED,
                 order.getTotalAmount()
         );
