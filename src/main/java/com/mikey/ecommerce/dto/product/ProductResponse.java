@@ -8,6 +8,8 @@ public record ProductResponse(
         String name,
         String description,
         String category,
+        String subcategory,
+        String brand,
         String imageUrl,
         boolean active,
         BigDecimal price,

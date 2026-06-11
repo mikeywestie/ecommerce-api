@@ -6,6 +6,8 @@ public record ProductSummaryResponse(
         Long id,
         String name,
         String category,
+        String subcategory,
+        String brand,
         String imageUrl,
         boolean active,
         BigDecimal price

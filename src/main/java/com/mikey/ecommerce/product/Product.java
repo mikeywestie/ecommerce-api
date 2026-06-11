@@ -3,7 +3,6 @@ package com.mikey.ecommerce.product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -29,6 +28,12 @@ public class Product {
     @Column(nullable = false)
     private String category;
 
+    @Column(nullable = false)
+    private String subcategory = "General";
+
+    @Column(nullable = false)
+    private String brand = "Generic";
+
     @Column(name = "image_url", length = 1000)
     private String imageUrl;
 
@@ -47,8 +52,7 @@ public class Product {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    protected Product() {
-    }
+    protected Product() {}
 
     public Product(
             String name,
@@ -58,9 +62,24 @@ public class Product {
             boolean active,
             BigDecimal price
     ) {
+        this(name, description, category, "General", "Generic", imageUrl, active, price);
+    }
+
+    public Product(
+            String name,
+            String description,
+            String category,
+            String subcategory,
+            String brand,
+            String imageUrl,
+            boolean active,
+            BigDecimal price
+    ) {
         this.name = name;
         this.description = description;
         this.category = category;
+        this.subcategory = subcategory == null || subcategory.isBlank() ? "General" : subcategory;
+        this.brand = brand == null || brand.isBlank() ? "Generic" : brand;
         this.imageUrl = imageUrl;
         this.active = active;
         this.price = price;
@@ -70,6 +89,8 @@ public class Product {
     public String getName() { return name; }
     public String getDescription() { return description; }
     public String getCategory() { return category; }
+    public String getSubcategory() { return subcategory; }
+    public String getBrand() { return brand; }
     public String getImageUrl() { return imageUrl; }
     public boolean isActive() { return active; }
     public BigDecimal getPrice() { return price; }
@@ -80,6 +101,8 @@ public class Product {
             String name,
             String description,
             String category,
+            String subcategory,
+            String brand,
             String imageUrl,
             boolean active,
             BigDecimal price
@@ -87,6 +110,8 @@ public class Product {
         this.name = name;
         this.description = description;
         this.category = category;
+        this.subcategory = subcategory == null || subcategory.isBlank() ? "General" : subcategory;
+        this.brand = brand == null || brand.isBlank() ? "Generic" : brand;
         this.imageUrl = imageUrl;
         this.active = active;
         this.price = price;

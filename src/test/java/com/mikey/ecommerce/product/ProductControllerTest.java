@@ -1,9 +1,9 @@
 package com.mikey.ecommerce.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.inventory.Inventory;
 import com.mikey.ecommerce.inventory.InventoryRepository;
-import com.mikey.ecommerce.common.ApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,9 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,10 +69,13 @@ class ProductControllerTest {
                 new BigDecimal("1299.99")
         );
 
-        when(productRepository.findByNameContainingIgnoreCaseAndPriceBetween(
+        when(productRepository.searchProducts(
                 eq("keyboard"),
                 eq(BigDecimal.ZERO),
                 eq(new BigDecimal("999999999")),
+                eq(""),
+                eq(""),
+                eq(""),
                 any(Pageable.class)
         )).thenReturn(new PageImpl<>(List.of(product)));
 
@@ -83,6 +84,9 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(1))
                 .andExpect(jsonPath("$.content[0].name").value("Mechanical Keyboard"))
+                .andExpect(jsonPath("$.content[0].category").value("Peripherals"))
+                .andExpect(jsonPath("$.content[0].subcategory").value("Keyboards"))
+                .andExpect(jsonPath("$.content[0].brand").value("Logitech"))
                 .andExpect(jsonPath("$.content[0].price").value(1299.99))
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(1))
@@ -99,13 +103,20 @@ class ProductControllerTest {
         );
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(inventoryRepository.findByProductId(1L))
+                .thenReturn(Optional.of(new Inventory(product, 12)));
 
         mockMvc.perform(get("/api/products/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Mechanical Keyboard"))
                 .andExpect(jsonPath("$.description").value("RGB keyboard"))
-                .andExpect(jsonPath("$.price").value(1299.99));
+                .andExpect(jsonPath("$.category").value("Peripherals"))
+                .andExpect(jsonPath("$.subcategory").value("Keyboards"))
+                .andExpect(jsonPath("$.brand").value("Logitech"))
+                .andExpect(jsonPath("$.price").value(1299.99))
+                .andExpect(jsonPath("$.availableQuantity").value(12))
+                .andExpect(jsonPath("$.stockStatus").value("IN_STOCK"));
     }
 
     @Test
@@ -114,6 +125,8 @@ class ProductControllerTest {
                 "Mechanical Keyboard",
                 "RGB keyboard",
                 "Peripherals",
+                "Keyboards",
+                "Logitech",
                 "https://example.com/keyboard.jpg",
                 true,
                 new BigDecimal("1299.99"),
@@ -132,7 +145,11 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Mechanical Keyboard"))
-                .andExpect(jsonPath("$.price").value(1299.99));
+                .andExpect(jsonPath("$.category").value("Peripherals"))
+                .andExpect(jsonPath("$.subcategory").value("Keyboards"))
+                .andExpect(jsonPath("$.brand").value("Logitech"))
+                .andExpect(jsonPath("$.price").value(1299.99))
+                .andExpect(jsonPath("$.availableQuantity").value(10));
 
         ArgumentCaptor<Inventory> inventoryCaptor =
                 ArgumentCaptor.forClass(Inventory.class);
@@ -151,6 +168,8 @@ class ProductControllerTest {
                 "",
                 "RGB keyboard",
                 "Peripherals",
+                "Keyboards",
+                "Logitech",
                 "https://example.com/keyboard.jpg",
                 true,
                 new BigDecimal("1299.99"),
@@ -179,6 +198,8 @@ class ProductControllerTest {
                 "Mechanical Keyboard",
                 "RGB keyboard",
                 "Peripherals",
+                "Keyboards",
+                "Logitech",
                 "https://example.com/keyboard.jpg",
                 true,
                 new BigDecimal("1299.99"),
@@ -187,6 +208,8 @@ class ProductControllerTest {
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productRepository.save(product)).thenReturn(product);
+        when(inventoryRepository.findByProductId(1L))
+                .thenReturn(Optional.of(new Inventory(product, 15)));
 
         mockMvc.perform(put("/api/products/1")
                         .contentType(APPLICATION_JSON)
@@ -195,7 +218,11 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Mechanical Keyboard"))
                 .andExpect(jsonPath("$.description").value("RGB keyboard"))
-                .andExpect(jsonPath("$.price").value(1299.99));
+                .andExpect(jsonPath("$.category").value("Peripherals"))
+                .andExpect(jsonPath("$.subcategory").value("Keyboards"))
+                .andExpect(jsonPath("$.brand").value("Logitech"))
+                .andExpect(jsonPath("$.price").value(1299.99))
+                .andExpect(jsonPath("$.availableQuantity").value(15));
     }
 
     @Test
@@ -209,11 +236,14 @@ class ProductControllerTest {
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productRepository.save(product)).thenReturn(product);
+        when(inventoryRepository.findByProductId(1L))
+                .thenReturn(Optional.of(new Inventory(product, 10)));
 
         mockMvc.perform(delete("/api/products/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.active").value(false));
+                .andExpect(jsonPath("$.active").value(false))
+                .andExpect(jsonPath("$.stockStatus").value("INACTIVE"));
 
         verify(productRepository).save(product);
         assertThat(product.isActive()).isFalse();
@@ -242,6 +272,8 @@ class ProductControllerTest {
                 name,
                 description,
                 "Peripherals",
+                "Keyboards",
+                "Logitech",
                 "https://example.com/product.jpg",
                 true,
                 price

@@ -10,6 +10,8 @@ public record ProductRequest(
         @NotBlank String name,
         String description,
         @NotBlank String category,
+        String subcategory,
+        String brand,
         String imageUrl,
         Boolean active,
         @NotNull @PositiveOrZero BigDecimal price,

@@ -44,6 +44,9 @@ public class ProductController {
     @GetMapping
     public PageResponse<ProductSummaryResponse> findAll(
             @RequestParam(name = "search", defaultValue = "") String search,
+            @RequestParam(name = "category", defaultValue = "") String category,
+            @RequestParam(name = "subcategory", defaultValue = "") String subcategory,
+            @RequestParam(name = "brand", defaultValue = "") String brand,
             @RequestParam(name = "minPrice", defaultValue = "0") BigDecimal minPrice,
             @RequestParam(name = "maxPrice", defaultValue = "999999999") BigDecimal maxPrice,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -59,13 +62,15 @@ public class ProductController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Product> products =
-                productRepository.findByNameContainingIgnoreCaseAndPriceBetween(
-                        search,
-                        minPrice,
-                        maxPrice,
-                        pageable
-                );
+        Page<Product> products = productRepository.searchProducts(
+                search,
+                minPrice,
+                maxPrice,
+                category,
+                subcategory,
+                brand,
+                pageable
+        );
 
         List<ProductSummaryResponse> content =
                 products.getContent()
@@ -88,8 +93,7 @@ public class ProductController {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException("Product not found"));
 
-        int availableQuantity = inventoryRepository
-                .findByProductId(product.getId())
+        int availableQuantity = inventoryRepository.findByProductId(product.getId())
                 .map(Inventory::getQuantityAvailable)
                 .orElse(0);
 
@@ -103,6 +107,8 @@ public class ProductController {
                         request.name(),
                         request.description(),
                         request.category(),
+                        request.subcategory(),
+                        request.brand(),
                         request.imageUrl(),
                         request.active() == null || request.active(),
                         request.price()
@@ -129,6 +135,8 @@ public class ProductController {
                 request.name(),
                 request.description(),
                 request.category(),
+                request.subcategory(),
+                request.brand(),
                 request.imageUrl(),
                 request.active() == null || request.active(),
                 request.price()
@@ -136,8 +144,7 @@ public class ProductController {
 
         Product savedProduct = productRepository.save(product);
 
-        int availableQuantity = inventoryRepository
-                .findByProductId(savedProduct.getId())
+        int availableQuantity = inventoryRepository.findByProductId(savedProduct.getId())
                 .map(Inventory::getQuantityAvailable)
                 .orElse(0);
 
@@ -153,8 +160,7 @@ public class ProductController {
 
         Product savedProduct = productRepository.save(product);
 
-        int availableQuantity = inventoryRepository
-                .findByProductId(savedProduct.getId())
+        int availableQuantity = inventoryRepository.findByProductId(savedProduct.getId())
                 .map(Inventory::getQuantityAvailable)
                 .orElse(0);
 

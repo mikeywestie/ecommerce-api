@@ -8,76 +8,89 @@ public class ProductMapper {
 
     private ProductMapper() {}
 
-    public static ProductResponse toResponse(Product p) {
-        return toResponse(p, null);
+    public static ProductResponse toResponse(Product product) {
+        return toResponse(product, null);
     }
 
-    public static ProductResponse toResponse(Product p, Integer availableQuantity) {
-        int stock = availableQuantity == null ? 0 : availableQuantity;
+    public static ProductResponse toResponse(
+            Product product,
+            Integer availableQuantity
+    ) {
+        String stockStatus = resolveStockStatus(product, availableQuantity);
+        String stockMessage = resolveStockMessage(product, availableQuantity, stockStatus);
 
         return new ProductResponse(
-                p.getId(),
-                p.getName(),
-                p.getDescription(),
-                p.getCategory(),
-                p.getImageUrl(),
-                p.isActive(),
-                p.getPrice(),
-                stock,
-                resolveStockStatus(p, stock),
-                resolveStockMessage(p, stock),
-                p.getCreatedAt()
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getCategory(),
+                product.getSubcategory(),
+                product.getBrand(),
+                product.getImageUrl(),
+                product.isActive(),
+                product.getPrice(),
+                availableQuantity,
+                stockStatus,
+                stockMessage,
+                product.getCreatedAt()
         );
     }
 
-    public static ProductSummaryResponse toSummary(Product p) {
+    public static ProductSummaryResponse toSummary(Product product) {
         return new ProductSummaryResponse(
-                p.getId(),
-                p.getName(),
-                p.getCategory(),
-                p.getImageUrl(),
-                p.isActive(),
-                p.getPrice()
+                product.getId(),
+                product.getName(),
+                product.getCategory(),
+                product.getSubcategory(),
+                product.getBrand(),
+                product.getImageUrl(),
+                product.isActive(),
+                product.getPrice()
         );
     }
 
-    private static String resolveStockStatus(Product product, int stock) {
+    private static String resolveStockStatus(
+            Product product,
+            Integer availableQuantity
+    ) {
         if (!product.isActive()) {
             return "INACTIVE";
         }
 
-        if (stock <= 0) {
+        if (availableQuantity == null) {
+            return null;
+        }
+
+        if (availableQuantity <= 0) {
             return "OUT_OF_STOCK";
         }
 
-        if (stock <= 5) {
+        if (availableQuantity <= 5) {
             return "LOW_STOCK";
         }
 
-        if (stock <= 10) {
+        if (availableQuantity <= 10) {
             return "ALMOST_SOLD_OUT";
         }
 
         return "IN_STOCK";
     }
 
-    private static String resolveStockMessage(Product product, int stock) {
-        if (!product.isActive()) {
-            return "This product is no longer available.";
+    private static String resolveStockMessage(
+            Product product,
+            Integer availableQuantity,
+            String stockStatus
+    ) {
+        if (stockStatus == null) {
+            return null;
         }
 
-        if (stock <= 0) {
-            return "Out of stock.";
-        }
-
-        if (stock <= 5) {
-            return "Low stock. " + stock + " left.";
-        }
-
-        if (stock <= 10) {
-            return "Almost sold out. " + stock + " left.";
-        }
-
-        return stock + " available.";
+        return switch (stockStatus) {
+            case "INACTIVE" -> "This product is no longer available.";
+            case "OUT_OF_STOCK" -> "This product is currently out of stock.";
+            case "LOW_STOCK" -> "Low stock. " + availableQuantity + " left.";
+            case "ALMOST_SOLD_OUT" -> "Almost sold out. " + availableQuantity + " left.";
+            default -> availableQuantity + " available.";
+        };
     }
 }
