@@ -1,13 +1,12 @@
 ALTER TABLE products
-ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE;
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE;
 
 UPDATE products
-SET updated_at = created_at
+SET updated_at = COALESCE(updated_at, created_at, NOW())
 WHERE updated_at IS NULL;
 
 ALTER TABLE products
 ALTER COLUMN updated_at SET NOT NULL;
 
-
 ALTER TABLE inventory
-ADD COLUMN version BIGINT NOT NULL DEFAULT 0;
+ADD COLUMN IF NOT EXISTS version BIGINT NOT NULL DEFAULT 0;
