@@ -1,5 +1,5 @@
 ALTER TABLE carts
-ADD COLUMN coupon_id BIGINT;
+ADD COLUMN IF NOT EXISTS coupon_id BIGINT;
 
 ALTER TABLE carts
 ADD CONSTRAINT fk_cart_coupon
