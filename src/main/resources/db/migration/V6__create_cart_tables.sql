@@ -1,4 +1,4 @@
-CREATE TABLE carts (
+CREATE TABLE IF NOT EXISTS carts (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE carts (
         REFERENCES users(id)
 );
 
-CREATE TABLE cart_items (
+CREATE TABLE IF NOT EXISTS cart_items (
     id BIGSERIAL PRIMARY KEY,
     cart_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
