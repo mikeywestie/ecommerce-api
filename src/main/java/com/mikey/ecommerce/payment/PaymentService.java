@@ -47,7 +47,12 @@ public class PaymentService {
             throw new ApiException("Only CREATED orders can be paid");
         }
 
-        boolean success = !"FAIL".equalsIgnoreCase(paymentMethod);
+        boolean failure =
+                "FAIL".equalsIgnoreCase(paymentMethod)
+                        || "FAILED".equalsIgnoreCase(paymentMethod)
+                        || "PAYMENT_FAILED".equalsIgnoreCase(paymentMethod);
+
+        boolean success = !failure;
 
         if (success) {
             order.markPaid();
