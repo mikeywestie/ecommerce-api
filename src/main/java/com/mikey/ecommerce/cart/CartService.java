@@ -128,7 +128,7 @@ public class CartService {
         return toResponse(cartRepository.save(cart));
     }
 
-    public OrderResponse checkout(String userEmail) {
+    public OrderResponse checkout(String userEmail, String paymentOutcome) {
         AppUser user = findUser(userEmail);
 
         Cart cart = cartRepository.findByUser(user)
@@ -189,7 +189,10 @@ public class CartService {
             );
         }
 
-        paymentService.processPaymentForOrder(order, "DEMO_CARD");
+        paymentService.processPaymentForOrder(
+                order,
+                resolvePaymentMethod(paymentOutcome)
+        );
 
         orderEventProducer.publish(
                 new OrderCreatedEvent(
@@ -230,6 +233,16 @@ public class CartService {
         cart.applyCoupon(null);
 
         return toResponse(cartRepository.save(cart));
+    }
+
+    private String resolvePaymentMethod(String paymentOutcome) {
+        if ("FAIL".equalsIgnoreCase(paymentOutcome)
+                || "FAILED".equalsIgnoreCase(paymentOutcome)
+                || "PAYMENT_FAILED".equalsIgnoreCase(paymentOutcome)) {
+            return "PAYMENT_FAILED";
+        }
+
+        return "DEMO_CARD";
     }
 
     private void validateCouponAvailability(Coupon coupon) {

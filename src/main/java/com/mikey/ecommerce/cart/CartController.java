@@ -60,8 +60,11 @@ public class CartController {
     }
 
     @PostMapping("/checkout")
-    public OrderResponse checkout(Authentication authentication) {
-        return cartService.checkout(authentication.getName());
+    public OrderResponse checkout(
+            Authentication authentication,
+            @RequestParam(name = "paymentOutcome", defaultValue = "SUCCESS") String paymentOutcome
+    ) {
+        return cartService.checkout(authentication.getName(), paymentOutcome);
     }
 
     @PostMapping("/apply-coupon/{code}")
