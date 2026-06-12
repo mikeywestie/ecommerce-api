@@ -24,6 +24,15 @@ public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
     """)
     Optional<CustomerOrder> findByIdWithItems(Long id);
 
+    @Query("""
+        select distinct o from CustomerOrder o
+        left join fetch o.items i
+        left join fetch i.product
+        where lower(o.customerEmail) = lower(:customerEmail)
+        order by o.createdAt desc
+    """)
+    List<CustomerOrder> findByCustomerEmailWithItems(String customerEmail);
+
     long countByStatus(OrderStatus status);
 
     @Query("""

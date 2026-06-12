@@ -15,6 +15,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.beans.factory.annotation.Value;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,15 +43,7 @@ public class SecurityConfig {
                         .toList()
         );
 
-        configuration.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "PATCH",
-                "DELETE",
-                "OPTIONS"
-        ));
-
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
@@ -65,9 +58,7 @@ public class SecurityConfig {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
@@ -89,16 +80,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
-                        .requestMatchers("/api/payments/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/my-orders").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/*").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("ADMIN", "CUSTOMER")
+
+                        .requestMatchers("/api/payments/**").hasRole("ADMIN")
                         .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
 
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
