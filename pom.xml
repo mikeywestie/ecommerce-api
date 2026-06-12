@@ -6,7 +6,7 @@
 
     <groupId>com.mikey</groupId>
     <artifactId>ecommerce-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.7.1</version>
     <name>ecommerce-api</name>
     <description>Java 21 Spring Boot 3 RESTful E-Commerce API</description>
 
