@@ -3,7 +3,10 @@ package com.mikey.ecommerce.payment;
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.events.OrderEventProducer;
 import com.mikey.ecommerce.events.PaymentProcessedEvent;
+import com.mikey.ecommerce.inventory.Inventory;
+import com.mikey.ecommerce.inventory.InventoryRepository;
 import com.mikey.ecommerce.order.CustomerOrder;
+import com.mikey.ecommerce.order.OrderItem;
 import com.mikey.ecommerce.order.OrderRepository;
 import com.mikey.ecommerce.order.OrderStatus;
 import org.springframework.stereotype.Service;
@@ -14,15 +17,18 @@ public class PaymentService {
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
+    private final InventoryRepository inventoryRepository;
     private final OrderEventProducer orderEventProducer;
 
     public PaymentService(
             OrderRepository orderRepository,
             PaymentRepository paymentRepository,
+            InventoryRepository inventoryRepository,
             OrderEventProducer orderEventProducer
     ) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
+        this.inventoryRepository = inventoryRepository;
         this.orderEventProducer = orderEventProducer;
     }
 
@@ -55,6 +61,7 @@ public class PaymentService {
         boolean success = !failure;
 
         if (success) {
+            reserveInventoryForPaidOrder(order);
             order.markPaid();
         } else {
             order.markPaymentFailed();
@@ -81,5 +88,18 @@ public class PaymentService {
         );
 
         return savedPayment;
+    }
+
+    private void reserveInventoryForPaidOrder(CustomerOrder order) {
+        for (OrderItem item : order.getItems()) {
+            Inventory inventory = inventoryRepository
+                    .findByProductId(item.getProduct().getId())
+                    .orElseThrow(() -> new ApiException(
+                            "Inventory not found for product: "
+                                    + item.getProduct().getName()
+                    ));
+
+            inventory.reserve(item.getQuantity());
+        }
     }
 }
