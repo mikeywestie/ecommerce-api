@@ -3,6 +3,7 @@ package com.mikey.ecommerce.payment;
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.events.OrderEventProducer;
 import com.mikey.ecommerce.events.PaymentProcessedEvent;
+import com.mikey.ecommerce.inventory.InventoryRepository;
 import com.mikey.ecommerce.order.CustomerOrder;
 import com.mikey.ecommerce.order.OrderRepository;
 import com.mikey.ecommerce.order.OrderStatus;
@@ -34,6 +35,9 @@ class PaymentServiceTest {
     private PaymentRepository paymentRepository;
 
     @Mock
+    private InventoryRepository inventoryRepository;
+
+    @Mock
     private OrderEventProducer orderEventProducer;
 
     private PaymentService paymentService;
@@ -43,6 +47,7 @@ class PaymentServiceTest {
         paymentService = new PaymentService(
                 orderRepository,
                 paymentRepository,
+                inventoryRepository,
                 orderEventProducer
         );
     }
@@ -123,6 +128,7 @@ class PaymentServiceTest {
                 PaymentStatus.SUCCESS,
                 new BigDecimal("500.00")
         );
+
         PaymentRequest request = new PaymentRequest(1L, "CARD");
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
