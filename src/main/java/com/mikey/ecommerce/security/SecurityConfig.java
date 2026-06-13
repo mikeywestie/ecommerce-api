@@ -88,6 +88,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/payments/**").hasRole("ADMIN")
                         .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
 
+                        .requestMatchers(HttpMethod.POST, "/api/system/bug-reports").hasAnyRole("ADMIN", "CUSTOMER")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
