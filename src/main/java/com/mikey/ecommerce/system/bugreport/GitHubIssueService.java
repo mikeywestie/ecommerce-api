@@ -39,7 +39,7 @@ public class GitHubIssueService {
         );
 
         GitHubIssueResponse githubResponse = restClient.post()
-                .uri("/repos/{repo}/issues", githubRepo)
+                .uri("/repos/" + githubRepo + "/issues")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken)
                 .header(HttpHeaders.ACCEPT, "application/vnd.github+json")
                 .contentType(MediaType.APPLICATION_JSON)
