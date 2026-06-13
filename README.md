@@ -1,405 +1,423 @@
-# 🛒 E-Commerce RESTful API
+# 🛒 E-Commerce API
 
-![Architecture_Diagram.png](docs/images/Architecture_Diagram.png)
+Production-style Spring Boot backend powering a full-stack e-commerce platform.
+
+This project demonstrates secure REST API development, role-based access control, realistic commerce workflows, Flyway database migrations, payment simulation, inventory handling, observability foundations, CI verification, build metadata, and GitHub-based bug reporting.
+
+![Architecture Overview](docs/images/01-architecture-overview.png)
+
+---
+
+## 🚀 Live Project
+
+| Resource | Link |
+|---|---|
+| Backend API | https://ecommerce-api-xrkk.onrender.com |
+| Swagger UI | https://ecommerce-api-xrkk.onrender.com/swagger-ui/index.html |
+| Frontend Demo | https://mikeywestie.github.io/ecommerce-admin-ui/ |
+| Frontend Repository | https://github.com/mikeywestie/ecommerce-admin-ui |
+
+---
+
+## 🧰 Tech Stack
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.5-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
-![Kafka](https://img.shields.io/badge/Apache_Kafka-Event_Driven-black)
-![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![Flyway](https://img.shields.io/badge/Flyway-Migrations-red)
 ![JWT](https://img.shields.io/badge/Security-JWT-success)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![Kafka](https://img.shields.io/badge/Apache_Kafka-Event_Driven-black)
+![Actuator](https://img.shields.io/badge/Spring_Actuator-Health-green)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-red)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-orange)
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-success)
-![Tests](https://img.shields.io/badge/Tests-40_Passing-brightgreen)
-![Coverage](https://img.shields.io/badge/Coverage-JaCoCo-orange)
-## 📚 API Documentation
-
-The platform exposes a fully documented REST API using OpenAPI 3 and Swagger UI. The screenshots below showcase the available endpoints across the different business domains.
-
-### Swagger UI Overview
-![Swagger UI](docs/images/swagger-ui.png)
-
-### Products Controller
-![Products Endpoints](docs/images/Products_Endpoints.png)
-
-### Payments Controller
-![Payments Endpoints](docs/images/Payments_Endpoints.png)
-
-### Orders Controller
-![Orders Endpoints](docs/images/Orders_Endpoints.png)
-
-### Coupon Controller
-![Coupon Endpoints](docs/images/Coupon_Endpoints.png)
-
-### Cart Controller
-![Cart Endpoints](docs/images/Cart_Endpoints.png)
-
-### Authentication Controller
-![Auth Endpoints](docs/images/Auth_Endpoints.png)
-
-### Inventory Controller
-![Inventory Endpoints](docs/images/Inventory_Endpoints.png)
-
-### Dashboard Controller
-![Dashboard Endpoints](docs/images/Dashboard_Endpoints.png)
+![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-success)
+![JaCoCo](https://img.shields.io/badge/Coverage-JaCoCo-orange)
 
 ---
 
-## 🐳 Containerized Infrastructure
+## 📦 Current Release
 
-The entire development environment is orchestrated with Docker Compose, including PostgreSQL, Apache Kafka, Prometheus, and Grafana.
+| Component | Version |
+|---|---|
+| Backend API | `v1.7.2` |
+| Frontend UI | `v1.2.1` |
 
-![Docker Containers](docs/images/Docker_Container.png)
+### v1.7.2 Highlights
 
----
-
-## ❤️ Application Health
-
-Spring Boot Actuator provides health, liveness, and readiness endpoints to ensure the application and all dependencies are operating correctly.
-
-![Actuator Health](docs/images/Actuator_Health.png)
-
----
-
-Production-style backend e-commerce platform built to showcase secure API development, event-driven architecture, observability, and DevOps practices.
-
-The platform models realistic commerce workflows and is complemented by a React-based admin dashboard for operational visibility.
-
-Frontend Admin Dashboard:  
-➡️ https://github.com/mikeywestie/ecommerce-admin-ui
+- Build metadata endpoint for deployed version, commit hash, branch, and build time
+- GitHub issue integration for in-app bug reporting
+- Payment simulation fixes for successful and failed checkout scenarios
+- Inventory reservation moved to successful payment flow
+- Customer order security improvements
+- Customer users can only access their own order history
+- Improved demo readiness for admin and customer workflows
 
 ---
 
 ## 🎯 Project Purpose
 
-This project demonstrates practical software engineering capabilities including:
+This repository is designed to demonstrate practical backend engineering beyond basic CRUD.
 
-- Layered Spring Boot architecture
-- Secure REST API design
-- JWT authentication and role-based access control
-- DTO-based API contracts
-- Bean validation and standardized ProblemDetail errors
-- PostgreSQL persistence with Flyway migrations
-- Optimistic locking and concurrency protection
-- Kafka domain event publishing
-- Docker Compose local infrastructure
-- Spring Boot Actuator health and metrics
-- Prometheus and Grafana observability
-- GitHub Actions CI verification
-- Testcontainers-based integration testing foundation
-- JaCoCo code coverage reporting
-- Service layer unit testing
-- MockMvc controller testing
-- Authentication and authorization testing
-- Continuous Integration with GitHub Actions
+It shows how a commerce API can be built with:
+
+- Clean Spring Boot layering
+- Secure authentication and authorization
+- Customer and admin role separation
+- Realistic order, payment, coupon, cart, and inventory workflows
+- Database versioning with Flyway
+- Production-style health checks
+- Build metadata visibility
+- CI verification and automated tests
+- GitHub issue creation from in-app bug reports
+- Docker-based local infrastructure
+- A clear roadmap toward event-driven microservices
 
 ---
 
-## 🧪 Test & Quality Status
+## 📚 API Documentation
 
-![JaCoCo_Test_Coverage.png](docs/images/JaCoCo_Test_Coverage.png)
+The API is documented with OpenAPI 3 and Swagger UI.
 
-The project includes automated testing across service, controller, authentication, and security layers.
+![Swagger Overview](docs/images/02-swagger-overview.png)
 
-### Current Test Suite
+### Controller Screenshots
 
-| Test Suite | Tests |
-|------------|-------:|
-| CartServiceTest | 6 |
-| CouponServiceTest | 3 |
-| OrderServiceTest | 3 |
-| PaymentServiceTest | 5 |
-| ProductControllerTest | 7 |
-| AuthControllerTest | 3 |
-| AuthServiceTest | 8 |
-| JwtServiceTest | 4 |
-| Testcontainers Smoke Test | 1 |
-| **Total** | **40** |
-
-### Security Rules Covered
-
-The authentication module contains automated tests validating:
-
-- Customer registration
-- Default customer role assignment
-- Initial administrator bootstrap registration
-- Prevention of unauthorized administrator creation
-- Duplicate email validation
-- JWT generation and validation
-- Authentication success scenarios
-- Authentication failure scenarios
-
-### Latest Test Results
-
-Tests run: 40  
-Failures: 0  
-Errors: 0  
-Skipped: 1  
-BUILD SUCCESS
+| Area | Screenshot |
+|---|---|
+| Authentication | ![Authentication Endpoints](docs/images/03-authentication-endpoints.png) |
+| Products | ![Products Endpoints](docs/images/04-products-endpoints.png) |
+| Inventory | ![Inventory Endpoints](docs/images/05-inventory-endpoints.png) |
+| Cart | ![Cart Endpoints](docs/images/06-cart-endpoints.png) |
+| Orders | ![Orders Endpoints](docs/images/07-orders-endpoints.png) |
+| Payments | ![Payments Endpoints](docs/images/08-payments-endpoints.png) |
+| Coupons | ![Coupons Endpoints](docs/images/09-coupons-endpoints.png) |
+| Dashboard | ![Dashboard Endpoints](docs/images/10-dashboard-endpoints.png) |
+| Bug Reporting | ![Bug Report Endpoint](docs/images/11-bug-report-endpoint.png) |
+| Admin User Management | ![Admin User Endpoint](docs/images/12-admin-user-endpoint.png) |
+| Build Information | ![Build Info Endpoint](docs/images/13-build-info-endpoint.png) |
 
 ---
 
-## 📊 Code Coverage
+## 🔐 Authentication and Authorization
 
-JaCoCo is integrated into the Maven build lifecycle and generates code coverage reports during verification.
+The backend uses JWT-based stateless authentication with Spring Security.
 
-Generate coverage locally:
+| Role | Purpose |
+|---|---|
+| `ADMIN` | Manage products, inventory, orders, payments, coupons, dashboard data, and system health |
+| `CUSTOMER` | Browse products, manage cart, checkout, view own order history, and report bugs |
+
+Security capabilities include:
+
+- JWT authentication
+- BCrypt password hashing
+- Role-based endpoint protection
+- Admin-only operational endpoints
+- Customer-specific order history
+- Secure API access from the React frontend
+
+---
+
+## 🧩 Core Domain Features
+
+### Product Catalog
+
+- Product listing
+- Category and subcategory support
+- Brand support
+- Product image URL support
+- Active/inactive product status
+- Demo product catalog seeded through Flyway
+
+### Inventory Management
+
+- Inventory per product
+- Stock quantity updates
+- Low-stock visibility in the UI
+- Optimistic locking support
+- Inventory reservation occurs only after successful payment
+
+Business rule:
+
+```text
+Order created      -> stock remains unchanged
+Payment successful -> stock decreases
+Payment failed     -> stock remains unchanged
+Refund/cancel      -> stock restoration planned
+```
+
+### Cart and Checkout
+
+- Customer cart
+- Add/remove/update cart items
+- Coupon application
+- Checkout from cart
+- Payment success simulation
+- Payment failure simulation
+
+### Orders
+
+- Admin can view all orders
+- Customer can view only their own orders
+- Orders include line items and totals
+- Order statuses include:
+
+```text
+CREATED
+PAID
+PAYMENT_FAILED
+CANCELLED
+```
+
+### Payments
+
+- Payment simulation
+- Successful payment marks order as `PAID`
+- Failed payment marks order as `PAYMENT_FAILED`
+- Payment records are stored separately
+- Inventory is reserved only on successful payment
+
+### Coupons
+
+Supported coupon rules include:
+
+| Code | Type | Rule |
+|---|---|---|
+| `SAVE10` | Percentage | Permanent demo coupon |
+| `WELCOME250` | Fixed amount | Permanent demo coupon |
+| `FIRSTBUY` | Fixed amount | Single-use first purchase coupon |
+| `VIP5` | Percentage | Reusable customer loyalty coupon |
+
+---
+
+## 🔨 Build Metadata
+
+The backend exposes build information so the deployed version can be verified from the UI.
+
+Endpoint:
+
+```http
+GET /api/system/build-info
+```
+
+Example response:
+
+```json
+{
+  "application": "ecommerce-api",
+  "version": "1.7.2",
+  "environment": "render",
+  "branch": "main",
+  "commit": "7b0f8ca...",
+  "commitShort": "7b0f8ca",
+  "buildTime": "2026-06-13T16:45:59Z"
+}
+```
+
+This makes it easy to verify exactly which backend build is currently deployed.
+
+---
+
+## 🐞 In-App GitHub Bug Reporting
+
+The frontend can submit bug reports directly to the backend.
+
+The backend then creates a GitHub issue in the frontend repository using a secure token stored in Render environment variables.
+
+Bug reports include:
+
+- User message
+- Steps to reproduce
+- Current route
+- User role
+- User email
+- Frontend version and commit
+- Backend version and commit
+- Browser details
+- Viewport size
+- Screenshot capture support
+
+Endpoint:
+
+```http
+POST /api/system/bug-reports
+```
+
+### Bug Report Dialog
+
+![Bug Report Dialog](docs/images/17-bug-report-dialog.png)
+
+### Generated GitHub Issue
+
+![Generated GitHub Issue](docs/images/18-github-issue-created.png)
+
+---
+
+## 🏗 Architecture
+
+```text
+React Admin / Customer UI
+        │
+        ▼
+Spring Boot REST API
+        │
+ ┌──────┼──────────────┬──────────────┐
+ ▼      ▼              ▼              ▼
+JWT   PostgreSQL     Flyway         GitHub Issues
+        │
+        ▼
+Domain Services
+        │
+ ┌──────┼──────────────┬──────────────┐
+ ▼      ▼              ▼              ▼
+Orders Payments     Inventory       Coupons
+        │
+        ▼
+Kafka Domain Events
+        │
+        ▼
+Actuator / Metrics
+        │
+        ▼
+Prometheus / Grafana Support
+```
+
+For a deeper explanation, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+---
+
+## 🐳 Local Infrastructure
+
+The local environment is containerized with Docker Compose.
+
+Typical services:
+
+- Spring Boot API
+- PostgreSQL
+- Apache Kafka
+- Zookeeper
+- Prometheus
+- Grafana
+
+![Docker Environment](docs/images/15-docker-environment.png)
+
+---
+
+## ❤️ Health and Observability
+
+Spring Boot Actuator exposes health and operational endpoints.
+
+Available health endpoints:
+
+```http
+GET /actuator/health
+GET /actuator/health/liveness
+GET /actuator/health/readiness
+```
+
+![Actuator Health](docs/images/14-actuator-health.png)
+
+The platform also includes support for:
+
+- Spring Boot Actuator
+- Prometheus metrics export
+- Grafana dashboards
+- Health, readiness, and liveness probes
+
+Prometheus and Grafana are configured through Docker Compose and are available for future operational monitoring and alerting enhancements.
+
+---
+
+## 🧪 Testing and Quality
+
+The project includes automated testing for service, controller, authentication, and security behavior.
+
+### Test Coverage Areas
+
+- Cart service
+- Coupon rules
+- Order creation
+- Payment processing
+- Product controller
+- Authentication controller
+- Authentication service
+- JWT service
+- Security rules
+- Testcontainers smoke test
+
+Run tests locally:
 
 ```bash
 mvn clean verify
+```
 
-Coverage reports are available at:
+Coverage report:
 
+```text
 target/site/jacoco/index.html
-Latest Coverage Report
-
-
-
-
-Quality Improvements
-
-Recent quality improvements include:
-
-GitHub Actions Continuous Integration
-JaCoCo Coverage Reporting
-Expanded Service Layer Testing
-Expanded MockMvc Controller Testing
-Authentication Service Testing
-Security Rule Validation
-Role-Based Registration Testing
-v1.7 Quality & Security Hardening ✅
-
-Features
-
-GitHub Actions CI Pipeline
-JaCoCo Code Coverage Reporting
-AuthService Test Suite
-Expanded MockMvc Controller Tests
-Expanded Service Layer Tests
-Administrator Bootstrap Registration Rules
-Security-Focused Test Coverage
-Customer and Administrator Registration Validation
-
-Why this milestone matters
-
-Demonstrates production-quality engineering practices including automated verification, security rule validation, code coverage analysis, continuous integration, and maintainable test-driven development practices.
-
----
-
-## 🚀 Current Release
-
-**Latest Stable Release:** `v1.7.0 Quality & Security Hardening ✅`  
-**Next Major Release:** `v2.0 Event-Driven Microservices 🚀`
-
----
-
-## 🗂️ Release Milestones
-
-Each milestone reflects an intentional architectural progression, prioritizing correctness, maintainability, and production readiness.
-
-### Architectural Trade-Offs and Decisions
-
-- **Modular Monolith First** — Simplifies development and debugging while preserving a clear migration path to microservices.
-- **REST APIs Before Kafka Workflows** — Stabilizes business rules before introducing asynchronous orchestration.
-- **DTO Mapping Over Entity Exposure** — Keeps persistence concerns separate from public API contracts.
-- **Optimistic Locking** — Protects inventory updates while maintaining good throughput.
-- **Docker Compose** — Provides a reproducible local development environment.
-- **Metrics Before Dashboards** — Exposes reliable metrics before visualizing them.
-- **Incremental Testing Strategy** — Builds a Testcontainers foundation before expanding coverage.
-
----
-
-### v1.0 Core REST API ✅
-
-Implemented foundational commerce capabilities.
-
-**Features**
-- Product catalog
-- Inventory management
-- Orders
-- Payment simulation
-- PostgreSQL persistence
-- Swagger/OpenAPI documentation
-
-**Why this milestone matters**  
-Established the core domain model and API structure.
-
----
-
-### v1.1 API Hardening ✅
-
-Improved API usability and resilience.
-
-**Features**
-- DTO refactor
-- Validation
-- Pagination, sorting, and filtering
-- ProblemDetail exception handling
-
-**Why this milestone matters**  
-Separated API contracts from entities and standardized error responses.
-
----
-
-### v1.2 Database Quality ✅
-
-Added production-quality data practices.
-
-**Features**
-- Flyway migrations
-- Auditing fields
-- Optimistic locking
-- Concurrency protection
-- Integration tests foundation
-
-**Why this milestone matters**  
-Supports repeatable schema evolution and stronger data integrity.
-
----
-
-### v1.3 Security ✅
-
-Secured the API.
-
-**Features**
-- JWT authentication
-- Stateless Spring Security
-- BCrypt password hashing
-- Role-based authorization
-
-**Roles**
-- ADMIN
-- CUSTOMER
-
-**Why this milestone matters**  
-Demonstrates modern API security patterns used in enterprise systems.
-
----
-
-### v1.4 Commerce Features ✅
-
-Implemented realistic commerce workflows.
-
-**Features**
-- Shopping cart
-- Cart checkout flow
-- Coupon engine
-- Fixed and percentage discounts
-- Kafka domain events
-
-**Published Events**
-- `order-created`
-- `payment-processed`
-- `coupon-applied`
-
-**Why this milestone matters**  
-Introduced event-driven thinking and richer business logic.
-
----
-
-### v1.5 DevOps Foundation ✅
-
-Operationalized the platform.
-
-**Features**
-- Docker Compose stack
-- Multi-stage Docker builds
-- GitHub Actions CI foundation
-- Spring Boot Actuator
-- Testcontainers foundation
-
-**Why this milestone matters**  
-Introduced deployment automation and operational tooling.
-
----
-
-### v1.6 Observability Complete ✅
-
-Added production-style monitoring.
-
-**Features**
-- Prometheus metrics endpoint
-- Prometheus scraping
-- Grafana dashboards
-- JVM metrics
-- HTTP metrics
-- Database connection metrics
-- Kafka metrics foundation
-
-**Why this milestone matters**  
-Provides visibility into application health and runtime behavior.
-
----
-
-## 🏗️ Architecture
-
-```text
-React Admin UI
-      │
-      ▼
-Spring Boot REST API
-      │
- ┌────┼────────────┐
- ▼    ▼            ▼
-JWT PostgreSQL   Kafka
-      │            │
-      ▼            ▼
-Spring Actuator  Domain Events
-      │
-      ▼
-Prometheus
-      │
-      ▼
-Grafana
 ```
 
-For a deeper portfolio-friendly explanation, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+![JaCoCo Coverage](docs/images/16-jacoco-coverage.png)
 
 ---
 
-## 🔁 System Flow
+## 🔐 Security Rules
 
-The platform models an end-to-end commerce flow, from authenticated API usage through order placement, payment processing, inventory updates, and operational monitoring.
+| Endpoint Area | Access |
+|---|---|
+| `/api/auth/**` | Public |
+| `GET /api/products/**` | Public |
+| `/api/cart/**` | Customer |
+| `GET /api/orders/my-orders` | Customer/Admin |
+| `GET /api/orders` | Admin |
+| `/api/inventory/**` | Admin |
+| `/api/coupons/**` | Admin |
+| `/api/dashboard/**` | Admin |
+| `/api/payments/**` | Admin |
+| `/api/system/bug-reports` | Authenticated customer/admin |
+| `/actuator/health/**` | Public |
+| `/actuator/prometheus` | Admin |
 
-```text
-User / Admin Dashboard
-        │
-        ▼
-Authenticate via JWT
-        │
-        ▼
-Create cart / place order
-        │
-        ▼
-Order workflow validates business rules
-        │
-        ▼
-Domain event published to Kafka
-        │
-        ▼
-Payment workflow processes transaction outcome
-        │
-        ▼
-Inventory is updated with concurrency protection
-        │
-        ▼
-Application metrics emitted through Actuator
-        │
-        ▼
-Prometheus scrapes metrics
-        │
-        ▼
-Grafana visualizes runtime health and behaviour
+---
+
+## 🔧 Environment Variables
+
+### Render / Production
+
+```env
+PORT=8080
+
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USERNAME=
+DB_PASSWORD=
+
+GITHUB_BUG_REPORT_TOKEN=
+GITHUB_BUG_REPORT_REPO=mikeywestie/ecommerce-admin-ui
+
+RENDER_GIT_COMMIT=
+RENDER_GIT_BRANCH=
+
+KAFKA_BOOTSTRAP_SERVERS=
 ```
 
-This flow is intentionally designed to show how a traditional REST API can evolve toward event-driven order management while still keeping the current implementation easy to run, test, and reason about locally.
+### CORS
+
+Current allowed origins include:
+
+```text
+http://localhost:5173
+http://localhost:5174
+https://mikeywestie.github.io
+```
 
 ---
 
 ## 🧪 API Usage Examples
 
-### Authenticate
+### Login
 
 ```http
 POST /api/auth/login
@@ -408,125 +426,260 @@ Content-Type: application/json
 
 ```json
 {
-  "email": "<user-email>",
-  "password": "<your-password>"
+  "email": "admin2@ecommerce.local",
+  "password": "Admin@12345"
 }
 ```
 
-Example response:
-
-```json
-{
-  "token": "<jwt-token>"
-}
-```
-
-### Create an Order
+### Get Products
 
 ```http
-POST /api/orders
+GET /api/products
+```
+
+### Get Customer Cart
+
+```http
+GET /api/cart
+Authorization: Bearer <jwt-token>
+```
+
+### Checkout With Successful Payment
+
+```http
+POST /api/cart/checkout?paymentOutcome=SUCCESS
+Authorization: Bearer <jwt-token>
+```
+
+### Checkout With Failed Payment
+
+```http
+POST /api/cart/checkout?paymentOutcome=PAYMENT_FAILED
+Authorization: Bearer <jwt-token>
+```
+
+### Submit Bug Report
+
+```http
+POST /api/system/bug-reports
 Authorization: Bearer <jwt-token>
 Content-Type: application/json
 ```
 
 ```json
 {
-  "customerName": "Michael Westman",
-  "customerEmail": "michael@example.com",
-  "items": [
-    {
-      "productId": 1,
-      "quantity": 2
-    }
-  ],
-  "couponCode": "WELCOME10"
+  "message": "Payment failed but order history shows paid.",
+  "stepsToReproduce": "1. Add product to cart\n2. Checkout\n3. Simulate payment failed",
+  "route": "/customer/checkout",
+  "userEmail": "customer@example.com",
+  "userRole": "CUSTOMER",
+  "frontendVersion": "1.2.1",
+  "frontendCommit": "abc1234",
+  "backendVersion": "1.7.2",
+  "backendCommit": "def5678",
+  "browser": "Chrome",
+  "viewport": "390x844"
 }
 ```
 
-### Process a Payment
+---
 
-```http
-POST /api/payments
-Authorization: Bearer <jwt-token>
-Content-Type: application/json
+## 🗂 Release Milestones
+
+### v1.0 Core REST API
+
+- Product catalog
+- Inventory management
+- Orders
+- Payment simulation
+- PostgreSQL persistence
+- Swagger/OpenAPI documentation
+
+### v1.1 API Hardening
+
+- DTO refactor
+- Bean validation
+- Pagination, sorting, and filtering
+- ProblemDetail-style errors
+
+### v1.2 Database Quality
+
+- Flyway migrations
+- Auditing fields
+- Optimistic locking
+- Repeatable schema evolution
+
+### v1.3 Security
+
+- JWT authentication
+- Stateless Spring Security
+- BCrypt password hashing
+- Role-based authorization
+
+### v1.4 Commerce Features
+
+- Shopping cart
+- Checkout flow
+- Coupon engine
+- Fixed and percentage discounts
+- Kafka domain events
+
+Published events:
+
+```text
+order-created
+payment-processed
+coupon-applied
 ```
 
-```json
-{
-  "orderId": 1,
-  "paymentMethod": "CARD",
-  "amount": 1299.99
-}
-```
+### v1.5 DevOps Foundation
 
-### Update Inventory
+- Docker Compose stack
+- Multi-stage Docker builds
+- GitHub Actions CI foundation
+- Spring Boot Actuator
+- Testcontainers foundation
 
-```http
-PATCH /api/inventory/{productId}
-Authorization: Bearer <jwt-token>
-Content-Type: application/json
-```
+### v1.6 Observability
 
-```json
-{
-  "quantityAvailable": 25
-}
-```
+- Prometheus metrics endpoint
+- Grafana dashboard support
+- JVM metrics
+- HTTP metrics
+- Database connection metrics
+- Kafka metrics foundation
 
-These examples are intended to make the project easy to explore during code reviews, technical interviews, and portfolio walkthroughs.
+### v1.7 Quality, Security, and Demo Readiness
+
+- Expanded automated tests
+- Customer-specific order history
+- Improved role-based access control
+- Build metadata endpoint
+- Payment simulation fixes
+- Inventory reservation aligned to successful payment
+- GitHub issue-based bug reporting
+- More realistic seeded demo data
 
 ---
 
 ## 🧠 Engineering Challenges Solved
 
-This project is not only a CRUD API. It intentionally includes practical backend engineering concerns that appear in real commerce and order management systems.
-
-| Challenge | Approach |
-| --- | --- |
-| Preventing accidental entity exposure | DTO-based API contracts separate persistence models from external responses. |
-| Standardizing validation and error responses | Bean Validation and Spring `ProblemDetail` provide consistent API feedback. |
-| Protecting inventory updates | Optimistic locking and concurrency-aware persistence reduce overselling risk. |
-| Securing protected resources | JWT-based stateless authentication and role-based authorization protect API operations. |
-| Supporting repeatable database changes | Flyway migrations make schema evolution trackable and reproducible. |
-| Introducing asynchronous workflows | Kafka domain events demonstrate event-driven architecture foundations. |
-| Running infrastructure locally | Docker Compose provisions PostgreSQL, Kafka, Prometheus, and Grafana. |
-| Monitoring runtime behaviour | Actuator, Prometheus, and Grafana expose health, JVM, HTTP, and database metrics. |
-| Building toward production readiness | CI verification and Testcontainers foundations support safer future changes. |
-
-These decisions help demonstrate maintainability, scalability thinking, operational awareness, and clean backend design.
+| Challenge | Solution |
+|---|---|
+| Preventing entity leakage | DTO-based API contracts |
+| Securing protected resources | JWT authentication and role-based authorization |
+| Handling customer/admin separation | Role-aware endpoints and route security |
+| Managing schema changes | Flyway migrations |
+| Avoiding incorrect stock changes | Inventory reserved only after successful payment |
+| Supporting failed payment demos | Explicit payment simulation outcomes |
+| Improving production visibility | Build metadata endpoint and actuator health |
+| Making bugs easier to report | GitHub issue creation from app bug reports |
+| Improving reliability | CI verification and automated tests |
+| Supporting future microservices | Modular domain boundaries and Kafka event foundation |
 
 ---
 
-## 🛣️ Roadmap
+## 🛣 Roadmap
 
-### v2.0 Event-Driven Microservices 🚀
+### v1.8 Demo Operations
 
-#### Service Decomposition
+- Cancel/refund backend endpoint
+- Restore inventory on refund
+- Admin bug report visibility
+- Screenshot attachment or external screenshot storage
+- MASTER/admin tooling for demo reset
+
+### v2.0 Event-Driven Microservices
+
+Planned service decomposition:
+
 - Product Service
 - Order Service
 - Payment Service
 - Inventory Service
+- Coupon Service
 
-#### Messaging Patterns
-- Saga Pattern
-- Transactional Outbox
-- Idempotent Consumers
-- Dead Letter Queues
+Planned messaging patterns:
 
-#### Platform Components
+- Saga pattern
+- Transactional outbox
+- Idempotent consumers
+- Dead letter queues
+
+Planned platform components:
+
 - API Gateway
-- Service Discovery
-- Distributed Configuration
-- Distributed Tracing
+- Service discovery
+- Distributed configuration
+- Distributed tracing
 
-#### Cloud Native
+Planned cloud-native additions:
+
 - Kubernetes
-- Helm Charts
-- GitOps
-- Cloud Deployment
+- Helm charts
+- GitOps deployment
+- Cloud observability
+
+---
+
+## 🖼 Screenshot Files Included
+
+```text
+docs/images/01-architecture-overview.png
+docs/images/02-swagger-overview.png
+docs/images/03-authentication-endpoints.png
+docs/images/04-products-endpoints.png
+docs/images/05-inventory-endpoints.png
+docs/images/06-cart-endpoints.png
+docs/images/07-orders-endpoints.png
+docs/images/08-payments-endpoints.png
+docs/images/09-coupons-endpoints.png
+docs/images/10-dashboard-endpoints.png
+docs/images/11-bug-report-endpoint.png
+docs/images/12-admin-user-endpoint.png
+docs/images/13-build-info-endpoint.png
+docs/images/14-actuator-health.png
+docs/images/15-docker-environment.png
+docs/images/16-jacoco-coverage.png
+docs/images/17-bug-report-dialog.png
+docs/images/18-github-issue-created.png
+```
 
 ---
 
 ## 💼 Portfolio Value
 
-This repository is designed to demonstrate full-stack backend capability beyond CRUD APIs. It shows practical experience with secure API design, integration patterns, data integrity, asynchronous messaging, Docker-based infrastructure, monitoring, and CI automation.
+This backend demonstrates the kind of engineering work expected in real business systems:
+
+- Secure APIs
+- Clear domain boundaries
+- Database migration discipline
+- Testing and CI
+- Operational health visibility
+- Build/version traceability
+- Realistic commerce workflows
+- Production-style debugging support
+- A practical path toward event-driven microservices
+
+It is intentionally built to be discussed in interviews, reviewed by technical leads, and paired with the React frontend as a complete full-stack portfolio system.
+
+---
+
+## 👨‍💻 Author
+
+**Michael Westman**
+
+Full Stack Software Engineer
+
+- Java
+- Spring Boot
+- PostgreSQL
+- Kafka
+- React
+- TypeScript
+- Docker
+- Cloud-ready application development
+
+GitHub: https://github.com/mikeywestie
+
+Portfolio: https://mikeywestie.github.io
