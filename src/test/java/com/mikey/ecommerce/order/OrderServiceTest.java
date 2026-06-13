@@ -48,7 +48,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void createOrder_shouldReserveInventoryAndSaveOrder() {
+    void createOrder_shouldValidateInventoryAndSaveOrderWithoutReservingStock() {
         Product product = productWithId(
                 1L,
                 "Mechanical Keyboard",
@@ -74,9 +74,12 @@ class OrderServiceTest {
         assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED);
         assertThat(savedOrder.getItems()).hasSize(1);
         assertThat(savedOrder.getTotalAmount()).isEqualByComparingTo("2599.98");
-        assertThat(inventory.getQuantityAvailable()).isEqualTo(8);
 
-        ArgumentCaptor<CustomerOrder> orderCaptor = ArgumentCaptor.forClass(CustomerOrder.class);
+        assertThat(inventory.getQuantityAvailable()).isEqualTo(10);
+
+        ArgumentCaptor<CustomerOrder> orderCaptor =
+                ArgumentCaptor.forClass(CustomerOrder.class);
+
         verify(orderRepository).save(orderCaptor.capture());
         assertThat(orderCaptor.getValue().getItems()).hasSize(1);
     }
@@ -100,7 +103,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void createOrder_shouldThrowApiException_whenInventoryIsInsufficient() {
+    void createOrder_shouldSaveOrder_whenInventoryExistsEvenIfPaymentWillReserveLater() {
         Product product = productWithId(
                 1L,
                 "Mechanical Keyboard",
@@ -116,12 +119,40 @@ class OrderServiceTest {
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(inventoryRepository.findByProductId(1L)).thenReturn(Optional.of(inventory));
+        when(orderRepository.save(any(CustomerOrder.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CustomerOrder savedOrder = orderService.createOrder(request);
+
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED);
+        assertThat(savedOrder.getItems()).hasSize(1);
+        assertThat(inventory.getQuantityAvailable()).isEqualTo(1);
+
+        verify(orderRepository).save(any(CustomerOrder.class));
+    }
+
+    @Test
+    void createOrder_shouldThrowApiException_whenInventoryDoesNotExist() {
+        Product product = productWithId(
+                1L,
+                "Mechanical Keyboard",
+                "RGB mechanical keyboard",
+                new BigDecimal("1299.99")
+        );
+
+        CreateOrderRequest request = new CreateOrderRequest(
+                "Michael Westman",
+                "michael@example.com",
+                List.of(new OrderItemRequest(1L, 2))
+        );
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(inventoryRepository.findByProductId(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> orderService.createOrder(request))
                 .isInstanceOf(ApiException.class)
-                .hasMessage("Not enough stock for product: Mechanical Keyboard");
+                .hasMessage("Inventory not found for product: Mechanical Keyboard");
 
-        assertThat(inventory.getQuantityAvailable()).isEqualTo(1);
         verify(orderRepository, never()).save(any());
     }
 
