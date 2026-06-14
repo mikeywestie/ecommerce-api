@@ -4,59 +4,65 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.product.Product;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @JsonIgnore
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
+  @JsonIgnore
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "cart_id", nullable = false)
+  private Cart cart;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "product_id", nullable = false)
+  private Product product;
 
-    @Column(nullable = false)
-    private int quantity;
+  @Column(nullable = false)
+  private int quantity;
 
-    protected CartItem() {
+  protected CartItem() {}
+
+  public CartItem(Cart cart, Product product, int quantity) {
+    if (quantity <= 0) {
+      throw new ApiException("Quantity must be greater than zero");
     }
 
-    public CartItem(Cart cart, Product product, int quantity) {
-        if (quantity <= 0) {
-            throw new ApiException("Quantity must be greater than zero");
-        }
+    this.cart = cart;
+    this.product = product;
+    this.quantity = quantity;
+  }
 
-        this.cart = cart;
-        this.product = product;
-        this.quantity = quantity;
+  public Long getId() {
+    return id;
+  }
+
+  public Cart getCart() {
+    return cart;
+  }
+
+  public Product getProduct() {
+    return product;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public BigDecimal getLineTotal() {
+    return product.getPrice().multiply(BigDecimal.valueOf(quantity));
+  }
+
+  public void updateQuantity(int quantity) {
+    if (quantity <= 0) {
+      throw new ApiException("Quantity must be greater than zero");
     }
 
-    public Long getId() { return id; }
-
-    public Cart getCart() { return cart; }
-
-    public Product getProduct() { return product; }
-
-    public int getQuantity() { return quantity; }
-
-    public BigDecimal getLineTotal() {
-        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
-    }
-
-    public void updateQuantity(int quantity) {
-        if (quantity <= 0) {
-            throw new ApiException("Quantity must be greater than zero");
-        }
-
-        this.quantity = quantity;
-    }
+    this.quantity = quantity;
+  }
 }

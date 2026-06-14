@@ -14,54 +14,55 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST controller responsible for administrative dashboard metrics.
  *
- * <p>This controller provides summary statistics used by the admin dashboard,
- * including aggregated business and operational metrics such as:</p>
+ * <p>This controller provides summary statistics used by the admin dashboard, including aggregated
+ * business and operational metrics such as:
+ *
  * <ul>
- *     <li>Total number of products</li>
- *     <li>Total number of orders</li>
- *     <li>Total number of payments</li>
- *     <li>Total revenue</li>
- *     <li>Inventory and operational insights</li>
+ *   <li>Total number of products
+ *   <li>Total number of orders
+ *   <li>Total number of payments
+ *   <li>Total revenue
+ *   <li>Inventory and operational insights
  * </ul>
  *
- * <p>The dashboard data is aggregated by {@link DashboardService} and returned
- * as a single response optimized for frontend dashboard consumption.</p>
+ * <p>The dashboard data is aggregated by {@link DashboardService} and returned as a single response
+ * optimized for frontend dashboard consumption.
  */
 @RestController
 @RequestMapping("/api/dashboard")
 @Tag(
-        name = "Dashboard",
-        description = "Administrative dashboard endpoints for retrieving business and operational summary metrics."
-)
+    name = "Dashboard",
+    description =
+        "Administrative dashboard endpoints for retrieving business and operational summary metrics.")
 public class DashboardController {
 
-    private final DashboardService dashboardService;
+  private final DashboardService dashboardService;
 
-    public DashboardController(DashboardService dashboardService) {
-        this.dashboardService = dashboardService;
-    }
+  public DashboardController(DashboardService dashboardService) {
+    this.dashboardService = dashboardService;
+  }
 
-    /**
-     * Retrieves a summary of dashboard metrics.
-     *
-     * @return dashboard summary response containing aggregated metrics
-     */
-    @Operation(
-            summary = "Get dashboard summary",
-            description = "Returns aggregated business metrics used by the admin dashboard, including totals for products, orders, payments, revenue, and inventory."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Dashboard summary retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = DashboardSummaryResponse.class)
-                    )
-            )
-    })
-    @GetMapping("/summary")
-    public DashboardSummaryResponse getSummary() {
-        return dashboardService.getSummary();
-    }
+  /**
+   * Retrieves a summary of dashboard metrics.
+   *
+   * @return dashboard summary response containing aggregated metrics
+   */
+  @Operation(
+      summary = "Get dashboard summary",
+      description =
+          "Returns aggregated business metrics used by the admin dashboard, including totals for products, orders, payments, revenue, and inventory.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Dashboard summary retrieved successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = DashboardSummaryResponse.class)))
+      })
+  @GetMapping("/summary")
+  public DashboardSummaryResponse getSummary() {
+    return dashboardService.getSummary();
+  }
 }

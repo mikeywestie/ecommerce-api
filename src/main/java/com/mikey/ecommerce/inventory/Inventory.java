@@ -8,62 +8,71 @@ import jakarta.persistence.*;
 @Table(name = "inventory")
 public class Inventory {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Version
-    private Long version;
+  @Version private Long version;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false, unique = true)
-    private Product product;
+  @OneToOne(optional = false)
+  @JoinColumn(name = "product_id", nullable = false, unique = true)
+  private Product product;
 
-    @Column(nullable = false)
-    private int quantityAvailable;
+  @Column(nullable = false)
+  private int quantityAvailable;
 
-    protected Inventory() {
+  protected Inventory() {}
+
+  public Inventory(Product product, int quantityAvailable) {
+    if (quantityAvailable < 0) {
+      throw new ApiException("Quantity cannot be negative");
     }
 
-    public Inventory(Product product, int quantityAvailable) {
-        if (quantityAvailable < 0) {
-            throw new ApiException("Quantity cannot be negative");
-        }
+    this.product = product;
+    this.quantityAvailable = quantityAvailable;
+  }
 
-        this.product = product;
-        this.quantityAvailable = quantityAvailable;
+  public Long getId() {
+    return id;
+  }
+
+  public Long getVersion() {
+    return version;
+  }
+
+  public Product getProduct() {
+    return product;
+  }
+
+  public int getQuantityAvailable() {
+    return quantityAvailable;
+  }
+
+  public void addStock(int quantity) {
+    if (quantity < 0) {
+      throw new ApiException("Quantity must be positive");
     }
 
-    public Long getId() { return id; }
-    public Long getVersion() { return version; }
-    public Product getProduct() { return product; }
-    public int getQuantityAvailable() { return quantityAvailable; }
+    this.quantityAvailable += quantity;
+  }
 
-    public void addStock(int quantity) {
-        if (quantity < 0) {
-            throw new ApiException("Quantity must be positive");
-        }
-
-        this.quantityAvailable += quantity;
+  public void setQuantity(int quantity) {
+    if (quantity < 0) {
+      throw new ApiException("Quantity cannot be negative");
     }
 
-    public void setQuantity(int quantity) {
-        if (quantity < 0) {
-            throw new ApiException("Quantity cannot be negative");
-        }
+    this.quantityAvailable = quantity;
+  }
 
-        this.quantityAvailable = quantity;
+  public void reserve(int quantity) {
+    if (quantity <= 0) {
+      throw new ApiException("Quantity must be greater than zero");
     }
 
-    public void reserve(int quantity) {
-        if (quantity <= 0) {
-            throw new ApiException("Quantity must be greater than zero");
-        }
-
-        if (quantityAvailable < quantity) {
-            throw new ApiException("Not enough stock for product: " + product.getName());
-        }
-
-        quantityAvailable -= quantity;
+    if (quantityAvailable < quantity) {
+      throw new ApiException("Not enough stock for product: " + product.getName());
     }
+
+    quantityAvailable -= quantity;
+  }
 }

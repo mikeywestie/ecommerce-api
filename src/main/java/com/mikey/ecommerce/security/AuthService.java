@@ -10,87 +10,71 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    private final AppUserRepository appUserRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+  private final AppUserRepository appUserRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
-    public AuthService(AppUserRepository appUserRepository,
-                       PasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
-        this.appUserRepository = appUserRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
+  public AuthService(
+      AppUserRepository appUserRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    this.appUserRepository = appUserRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
+  }
+
+  public AuthResponse register(RegisterRequest request) {
+    if (appUserRepository.existsByEmail(request.email())) {
+      throw new ApiException("Email already registered");
     }
 
-    public AuthResponse register(RegisterRequest request) {
-        if (appUserRepository.existsByEmail(request.email())) {
-            throw new ApiException("Email already registered");
-        }
+    Role requestedRole = request.role() == null ? Role.CUSTOMER : request.role();
 
-        Role requestedRole = request.role() == null
-                ? Role.CUSTOMER
-                : request.role();
-
-        if (requestedRole == Role.ADMIN && appUserRepository.existsByRole(Role.ADMIN)) {
-            throw new ApiException("Only an admin can register another admin");
-        }
-
-        AppUser user = new AppUser(
-                request.name(),
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                requestedRole
-        );
-
-        AppUser savedUser = appUserRepository.save(user);
-        String token = jwtService.generateToken(savedUser);
-
-        return new AuthResponse(
-                token,
-                "Bearer",
-                savedUser.getEmail(),
-                savedUser.getRole().name()
-        );
+    if (requestedRole == Role.ADMIN && appUserRepository.existsByRole(Role.ADMIN)) {
+      throw new ApiException("Only an admin can register another admin");
     }
 
-    public AuthResponse login(LoginRequest request) {
-        AppUser user = appUserRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ApiException("Invalid email or password"));
+    AppUser user =
+        new AppUser(
+            request.name(),
+            request.email(),
+            passwordEncoder.encode(request.password()),
+            requestedRole);
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new ApiException("Invalid email or password");
-        }
+    AppUser savedUser = appUserRepository.save(user);
+    String token = jwtService.generateToken(savedUser);
 
-        String token = jwtService.generateToken(user);
+    return new AuthResponse(token, "Bearer", savedUser.getEmail(), savedUser.getRole().name());
+  }
 
-        return new AuthResponse(
-                token,
-                "Bearer",
-                user.getEmail(),
-                user.getRole().name()
-        );
+  public AuthResponse login(LoginRequest request) {
+    AppUser user =
+        appUserRepository
+            .findByEmail(request.email())
+            .orElseThrow(() -> new ApiException("Invalid email or password"));
+
+    if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+      throw new ApiException("Invalid email or password");
     }
 
-    public AuthResponse registerAdmin(RegisterRequest request) {
-        if (appUserRepository.existsByEmail(request.email())) {
-            throw new ApiException("Email already registered");
-        }
+    String token = jwtService.generateToken(user);
 
-        AppUser user = new AppUser(
-                request.name(),
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                Role.ADMIN
-        );
+    return new AuthResponse(token, "Bearer", user.getEmail(), user.getRole().name());
+  }
 
-        AppUser savedUser = appUserRepository.save(user);
-        String token = jwtService.generateToken(savedUser);
-
-        return new AuthResponse(
-                token,
-                "Bearer",
-                savedUser.getEmail(),
-                savedUser.getRole().name()
-        );
+  public AuthResponse registerAdmin(RegisterRequest request) {
+    if (appUserRepository.existsByEmail(request.email())) {
+      throw new ApiException("Email already registered");
     }
+
+    AppUser user =
+        new AppUser(
+            request.name(),
+            request.email(),
+            passwordEncoder.encode(request.password()),
+            Role.ADMIN);
+
+    AppUser savedUser = appUserRepository.save(user);
+    String token = jwtService.generateToken(savedUser);
+
+    return new AuthResponse(token, "Bearer", savedUser.getEmail(), savedUser.getRole().name());
+  }
 }

@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/users")
 public class AdminUserController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    public AdminUserController(AuthService authService) {
-        this.authService = authService;
-    }
+  public AdminUserController(AuthService authService) {
+    this.authService = authService;
+  }
 
-    @PostMapping("/admins")
-    @PreAuthorize("hasRole('ADMIN')")
-    public AuthResponse createAdmin(@Valid @RequestBody RegisterRequest request) {
-        return authService.registerAdmin(request);
-    }
+  @PostMapping("/admins")
+  @PreAuthorize("hasRole('ADMIN')")
+  public AuthResponse createAdmin(@Valid @RequestBody RegisterRequest request) {
+    return authService.registerAdmin(request);
+  }
 }

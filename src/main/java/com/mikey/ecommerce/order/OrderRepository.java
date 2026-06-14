@@ -1,44 +1,47 @@
 package com.mikey.ecommerce.order;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
 
-    @Query("""
+  @Query(
+      """
         select distinct o from CustomerOrder o
         left join fetch o.items i
         left join fetch i.product
     """)
-    List<CustomerOrder> findAllWithItems();
+  List<CustomerOrder> findAllWithItems();
 
-    @Query("""
+  @Query(
+      """
         select o from CustomerOrder o
         left join fetch o.items i
         left join fetch i.product
         where o.id = :id
     """)
-    Optional<CustomerOrder> findByIdWithItems(Long id);
+  Optional<CustomerOrder> findByIdWithItems(Long id);
 
-    @Query("""
+  @Query(
+      """
         select distinct o from CustomerOrder o
         left join fetch o.items i
         left join fetch i.product
         where lower(o.customerEmail) = lower(:customerEmail)
         order by o.createdAt desc
     """)
-    List<CustomerOrder> findByCustomerEmailWithItems(String customerEmail);
+  List<CustomerOrder> findByCustomerEmailWithItems(String customerEmail);
 
-    long countByStatus(OrderStatus status);
+  long countByStatus(OrderStatus status);
 
-    @Query("""
+  @Query(
+      """
        SELECT COALESCE(SUM(o.totalAmount), 0)
        FROM CustomerOrder o
        WHERE o.status = :status
        """)
-    BigDecimal sumTotalAmountByStatus(OrderStatus status);
+  BigDecimal sumTotalAmountByStatus(OrderStatus status);
 }

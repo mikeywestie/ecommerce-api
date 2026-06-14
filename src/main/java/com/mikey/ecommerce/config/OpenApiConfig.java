@@ -9,19 +9,20 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        scheme = "bearer",
-        bearerFormat = "JWT"
-)
+    name = "bearerAuth",
+    type = SecuritySchemeType.HTTP,
+    scheme = "bearer",
+    bearerFormat = "JWT")
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI ecommerceOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("E-Commerce REST API")
-                        .version("1.0.0")
-                        .description("Java 21 Spring Boot 3 backend for products, inventory, orders and payments."));
-    }
+  @Bean
+  public OpenAPI ecommerceOpenAPI() {
+    return new OpenAPI()
+        .info(
+            new Info()
+                .title("E-Commerce REST API")
+                .version("1.0.0")
+                .description(
+                    "Java 21 Spring Boot 3 backend for products, inventory, orders and payments."));
+  }
 }

@@ -3,19 +3,22 @@ name: Java CI
 on:
   push:
     branches:
-      - main
+      - dev
       - develop
+      - main
       - "feat/**"
       - "feature/**"
       - "fix/**"
 
   pull_request:
     branches:
+      - dev
+      - develop
       - main
 
 jobs:
   build:
-    name: Build and Test
+    name: Format, Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -28,6 +31,9 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
+
+      - name: Check code formatting
+        run: mvn com.diffplug.spotless:spotless-maven-plugin:2.44.5:check
 
       - name: Run verification
         run: mvn clean verify
