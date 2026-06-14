@@ -3,7 +3,6 @@ package com.mikey.ecommerce.cart;
 import com.mikey.ecommerce.coupon.Coupon;
 import com.mikey.ecommerce.security.AppUser;
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,54 +11,63 @@ import java.util.List;
 @Table(name = "carts")
 public class Cart {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private AppUser user;
+  @OneToOne(optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private AppUser user;
 
-    @Column(nullable = false)
-    private Instant createdAt = Instant.now();
+  @Column(nullable = false)
+  private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items = new ArrayList<>();
+  @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<CartItem> items = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
+  @ManyToOne
+  @JoinColumn(name = "coupon_id")
+  private Coupon coupon;
 
-    protected Cart() {
-    }
+  protected Cart() {}
 
-    public Cart(AppUser user) {
-        this.user = user;
-    }
+  public Cart(AppUser user) {
+    this.user = user;
+  }
 
-    public Long getId() { return id; }
+  public Long getId() {
+    return id;
+  }
 
-    public AppUser getUser() { return user; }
+  public AppUser getUser() {
+    return user;
+  }
 
-    public Instant getCreatedAt() { return createdAt; }
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 
-    public List<CartItem> getItems() { return items; }
+  public List<CartItem> getItems() {
+    return items;
+  }
 
-    public Coupon getCoupon() { return coupon; }
+  public Coupon getCoupon() {
+    return coupon;
+  }
 
-    public void addItem(CartItem item) {
-        this.items.add(item);
-    }
+  public void addItem(CartItem item) {
+    this.items.add(item);
+  }
 
-    public void removeItem(CartItem item) {
-        this.items.remove(item);
-    }
+  public void removeItem(CartItem item) {
+    this.items.remove(item);
+  }
 
-    public void clear() {
-        this.items.clear();
-    }
+  public void clear() {
+    this.items.clear();
+  }
 
-    public void applyCoupon(Coupon coupon) {
-        this.coupon = coupon;
-    }
+  public void applyCoupon(Coupon coupon) {
+    this.coupon = coupon;
+  }
 }

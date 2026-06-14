@@ -4,8 +4,4 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 public record CouponAppliedEvent(
-        Long orderId,
-        String couponCode,
-        BigDecimal discountAmount,
-        Instant appliedAt
-) {}
+    Long orderId, String couponCode, BigDecimal discountAmount, Instant appliedAt) {}

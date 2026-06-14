@@ -6,16 +6,14 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 
 public record CreateCouponRequest(
-        @NotBlank String code,
-        @NotNull CouponType type,
-        @NotNull @DecimalMin("0.01") BigDecimal value,
-        @NotNull @Future Instant expiresAt,
-        Boolean reusable,
-        @Min(1) Integer maxUsesPerCustomer,
-        @Min(1) Integer maxTotalUses
-) {}
+    @NotBlank String code,
+    @NotNull CouponType type,
+    @NotNull @DecimalMin("0.01") BigDecimal value,
+    @NotNull @Future Instant expiresAt,
+    Boolean reusable,
+    @Min(1) Integer maxUsesPerCustomer,
+    @Min(1) Integer maxTotalUses) {}

@@ -1,11 +1,10 @@
 package com.mikey.ecommerce.cart;
 
 import com.mikey.ecommerce.security.AppUser;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    Optional<Cart> findByUser(AppUser user);
+  Optional<Cart> findByUser(AppUser user);
 }

@@ -1,5 +1,8 @@
 package com.mikey.ecommerce.security;
 
+import java.util.Arrays;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,90 +17,93 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOrigins;
+  @Value("${app.cors.allowed-origins}")
+  private String allowedOrigins;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
+  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+  }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                Arrays.stream(allowedOrigins.split(","))
-                        .map(String::trim)
-                        .toList()
-        );
+    configuration.setAllowedOrigins(
+        Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList());
 
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
 
-        return source;
-    }
+    return source;
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/actuator/health",
-                                "/actuator/health/**"
-                        ).permitAll()
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(
+                        "/api/auth/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/actuator/health",
+                        "/actuator/health/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/products/**")
+                    .permitAll()
+                    .requestMatchers(
+                        "/actuator/prometheus", "/actuator/metrics/**", "/actuator/info")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/api/dashboard/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/api/inventory/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/api/coupons/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/products")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/products/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/products/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/orders/my-orders")
+                    .hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers(HttpMethod.GET, "/api/orders")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/orders/*")
+                    .hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers(HttpMethod.POST, "/api/orders")
+                    .hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers("/api/payments/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/api/cart/**")
+                    .hasRole("CUSTOMER")
+                    .requestMatchers(HttpMethod.POST, "/api/system/bug-reports")
+                    .hasAnyRole("ADMIN", "CUSTOMER")
+                    .anyRequest()
+                    .authenticated())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
 
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-
-                        .requestMatchers("/actuator/prometheus", "/actuator/metrics/**", "/actuator/info").hasRole("ADMIN")
-                        .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
-                        .requestMatchers("/api/inventory/**").hasRole("ADMIN")
-                        .requestMatchers("/api/coupons/**").hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.GET, "/api/orders/my-orders").hasAnyRole("ADMIN", "CUSTOMER")
-                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/orders/*").hasAnyRole("ADMIN", "CUSTOMER")
-                        .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("ADMIN", "CUSTOMER")
-
-                        .requestMatchers("/api/payments/**").hasRole("ADMIN")
-                        .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
-
-                        .requestMatchers(HttpMethod.POST, "/api/system/bug-reports").hasAnyRole("ADMIN", "CUSTOMER")
-
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }

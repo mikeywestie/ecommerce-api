@@ -10,89 +10,84 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller responsible for coupon management.
  *
- * <p>This controller provides endpoints for:</p>
+ * <p>This controller provides endpoints for:
+ *
  * <ul>
- *     <li>Creating discount coupons</li>
- *     <li>Retrieving all available coupons</li>
+ *   <li>Creating discount coupons
+ *   <li>Retrieving all available coupons
  * </ul>
  *
- * <p>Coupons can be used during checkout to apply discounts to customer orders.</p>
+ * <p>Coupons can be used during checkout to apply discounts to customer orders.
  */
 @RestController
 @RequestMapping("/api/coupons")
 @Tag(
-        name = "Coupons",
-        description = "Coupon management endpoints for creating and retrieving discount coupons."
-)
+    name = "Coupons",
+    description = "Coupon management endpoints for creating and retrieving discount coupons.")
 public class CouponController {
 
-    private final CouponService couponService;
+  private final CouponService couponService;
 
-    public CouponController(CouponService couponService) {
-        this.couponService = couponService;
-    }
+  public CouponController(CouponService couponService) {
+    this.couponService = couponService;
+  }
 
-    /**
-     * Creates a new coupon.
-     *
-     * @param request coupon creation request
-     * @return created coupon response
-     */
-    @Operation(
-            summary = "Create coupon",
-            description = "Creates a new discount coupon that can be applied during checkout."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Coupon created successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CouponResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Validation failed"
-            )
-    })
-    @PostMapping
-    public CouponResponse create(
-            @Parameter(description = "Coupon creation request containing code, discount, and expiry details")
-            @Valid
-            @RequestBody CreateCouponRequest request
-    ) {
-        return couponService.create(request);
-    }
+  /**
+   * Creates a new coupon.
+   *
+   * @param request coupon creation request
+   * @return created coupon response
+   */
+  @Operation(
+      summary = "Create coupon",
+      description = "Creates a new discount coupon that can be applied during checkout.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Coupon created successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CouponResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Validation failed")
+      })
+  @PostMapping
+  public CouponResponse create(
+      @Parameter(
+              description = "Coupon creation request containing code, discount, and expiry details")
+          @Valid
+          @RequestBody
+          CreateCouponRequest request) {
+    return couponService.create(request);
+  }
 
-    /**
-     * Retrieves all coupons.
-     *
-     * @return list of coupon responses
-     */
-    @Operation(
-            summary = "Get all coupons",
-            description = "Returns a list of all coupons available in the system."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Coupons retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CouponResponse.class)
-                    )
-            )
-    })
-    @GetMapping
-    public List<CouponResponse> findAll() {
-        return couponService.findAll();
-    }
+  /**
+   * Retrieves all coupons.
+   *
+   * @return list of coupon responses
+   */
+  @Operation(
+      summary = "Get all coupons",
+      description = "Returns a list of all coupons available in the system.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Coupons retrieved successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CouponResponse.class)))
+      })
+  @GetMapping
+  public List<CouponResponse> findAll() {
+    return couponService.findAll();
+  }
 }

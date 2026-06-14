@@ -9,5 +9,4 @@ public record PaymentProcessedEvent(
     String paymentMethod,
     String status,
     BigDecimal amount,
-    Instant paidAt
-) {}
+    Instant paidAt) {}
