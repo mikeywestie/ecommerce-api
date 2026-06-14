@@ -13,6 +13,7 @@ on:
   pull_request:
     branches:
       - dev
+      - develop
       - main
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
           cache: maven
 
       - name: Check code formatting
-        run: mvn spotless:check
+        run: mvn com.diffplug.spotless:spotless-maven-plugin:2.44.5:check
 
       - name: Run verification
         run: mvn clean verify
