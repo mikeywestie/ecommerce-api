@@ -2,6 +2,8 @@ package com.mikey.ecommerce.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(ApiException.class)
   public ProblemDetail handleApiException(ApiException ex) {
@@ -48,8 +52,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
-    // Print the full stack trace to the Docker logs
-    ex.printStackTrace();
+    log.error("Unexpected error on {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
     ProblemDetail detail =
         ProblemDetail.forStatusAndDetail(
