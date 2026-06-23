@@ -3,6 +3,7 @@ package com.mikey.ecommerce.inventory;
 import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.product.Product;
 import jakarta.persistence.*;
+import org.springframework.http.HttpStatus;
 
 @Entity
 @Table(name = "inventory")
@@ -25,7 +26,7 @@ public class Inventory {
 
   public Inventory(Product product, int quantityAvailable) {
     if (quantityAvailable < 0) {
-      throw new ApiException("Quantity cannot be negative");
+      throw new ApiException("Quantity cannot be negative", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     this.product = product;
@@ -50,7 +51,7 @@ public class Inventory {
 
   public void addStock(int quantity) {
     if (quantity < 0) {
-      throw new ApiException("Quantity must be positive");
+      throw new ApiException("Quantity must be positive", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     this.quantityAvailable += quantity;
@@ -58,7 +59,7 @@ public class Inventory {
 
   public void setQuantity(int quantity) {
     if (quantity < 0) {
-      throw new ApiException("Quantity cannot be negative");
+      throw new ApiException("Quantity cannot be negative", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     this.quantityAvailable = quantity;
@@ -66,11 +67,12 @@ public class Inventory {
 
   public void reserve(int quantity) {
     if (quantity <= 0) {
-      throw new ApiException("Quantity must be greater than zero");
+      throw new ApiException("Quantity must be greater than zero", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     if (quantityAvailable < quantity) {
-      throw new ApiException("Not enough stock for product: " + product.getName());
+      throw new ApiException(
+          "Not enough stock for product: " + product.getName(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     quantityAvailable -= quantity;

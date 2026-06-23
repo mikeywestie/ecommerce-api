@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -76,7 +77,9 @@ public class ProductController {
   @GetMapping("/{id}")
   public ProductResponse findById(@PathVariable("id") Long id) {
     Product product =
-        productRepository.findById(id).orElseThrow(() -> new ApiException("Product not found"));
+        productRepository
+            .findById(id)
+            .orElseThrow(() -> new ApiException("Product not found", HttpStatus.NOT_FOUND));
 
     int availableQuantity =
         inventoryRepository
@@ -112,7 +115,9 @@ public class ProductController {
   public ProductResponse update(
       @PathVariable("id") Long id, @Valid @RequestBody ProductRequest request) {
     Product product =
-        productRepository.findById(id).orElseThrow(() -> new ApiException("Product not found"));
+        productRepository
+            .findById(id)
+            .orElseThrow(() -> new ApiException("Product not found", HttpStatus.NOT_FOUND));
 
     product.update(
         request.name(),
@@ -138,7 +143,9 @@ public class ProductController {
   @DeleteMapping("/{id}")
   public ProductResponse obsolete(@PathVariable("id") Long id) {
     Product product =
-        productRepository.findById(id).orElseThrow(() -> new ApiException("Product not found"));
+        productRepository
+            .findById(id)
+            .orElseThrow(() -> new ApiException("Product not found", HttpStatus.NOT_FOUND));
 
     product.deactivate();
 
@@ -155,19 +162,19 @@ public class ProductController {
 
   private void validatePaginationAndSorting(int page, int size, String sortBy, String sortDir) {
     if (page < 0) {
-      throw new ApiException("Page number cannot be negative");
+      throw new ApiException("Page number cannot be negative", HttpStatus.BAD_REQUEST);
     }
 
     if (size < 1 || size > 100) {
-      throw new ApiException("Page size must be between 1 and 100");
+      throw new ApiException("Page size must be between 1 and 100", HttpStatus.BAD_REQUEST);
     }
 
     if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
-      throw new ApiException("Invalid sort field");
+      throw new ApiException("Invalid sort field", HttpStatus.BAD_REQUEST);
     }
 
     if (!ALLOWED_SORT_DIRECTIONS.contains(sortDir.toLowerCase())) {
-      throw new ApiException("Invalid sort direction");
+      throw new ApiException("Invalid sort direction", HttpStatus.BAD_REQUEST);
     }
   }
 }

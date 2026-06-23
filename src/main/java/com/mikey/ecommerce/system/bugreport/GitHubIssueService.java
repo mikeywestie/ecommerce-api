@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -26,7 +27,8 @@ public class GitHubIssueService {
 
   public BugReportResponse createBugReport(BugReportRequest request) {
     if (githubToken == null || githubToken.isBlank()) {
-      throw new ApiException("GitHub bug report token is not configured");
+      throw new ApiException(
+          "GitHub bug report token is not configured", HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     GitHubIssueRequest githubRequest =
@@ -45,7 +47,7 @@ public class GitHubIssueService {
             .body(GitHubIssueResponse.class);
 
     if (githubResponse == null) {
-      throw new ApiException("GitHub issue could not be created");
+      throw new ApiException("GitHub issue could not be created", HttpStatus.BAD_GATEWAY);
     }
 
     return new BugReportResponse(true, githubResponse.htmlUrl(), githubResponse.number());

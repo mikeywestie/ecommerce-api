@@ -19,8 +19,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ApiException.class)
   public ProblemDetail handleApiException(ApiException ex) {
-    ProblemDetail detail =
-        ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    ProblemDetail detail = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
     detail.setType(URI.create("https://api.ecommerce.local/errors/business-rule"));
     return detail;
   }

@@ -9,6 +9,7 @@ import com.mikey.ecommerce.order.CustomerOrder;
 import com.mikey.ecommerce.order.OrderItem;
 import com.mikey.ecommerce.order.OrderRepository;
 import com.mikey.ecommerce.order.OrderStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,7 @@ public class PaymentService {
     CustomerOrder order =
         orderRepository
             .findById(request.orderId())
-            .orElseThrow(() -> new ApiException("Order not found"));
+            .orElseThrow(() -> new ApiException("Order not found", HttpStatus.NOT_FOUND));
 
     return processPaymentForOrder(order, request.paymentMethod());
   }
@@ -44,11 +45,11 @@ public class PaymentService {
   @Transactional
   public Payment processPaymentForOrder(CustomerOrder order, String paymentMethod) {
     if (paymentRepository.findByOrderId(order.getId()).isPresent()) {
-      throw new ApiException("Payment already exists for this order");
+      throw new ApiException("Payment already exists for this order", HttpStatus.CONFLICT);
     }
 
     if (order.getStatus() != OrderStatus.CREATED) {
-      throw new ApiException("Only CREATED orders can be paid");
+      throw new ApiException("Only CREATED orders can be paid", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     boolean failure =
@@ -94,7 +95,8 @@ public class PaymentService {
               .orElseThrow(
                   () ->
                       new ApiException(
-                          "Inventory not found for product: " + item.getProduct().getName()));
+                          "Inventory not found for product: " + item.getProduct().getName(),
+                          HttpStatus.NOT_FOUND));
 
       inventory.reserve(item.getQuantity());
     }

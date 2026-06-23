@@ -6,6 +6,7 @@ import com.mikey.ecommerce.mapper.InventoryMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,7 +33,8 @@ public class InventoryController {
     return InventoryMapper.toResponse(
         inventoryRepository
             .findByProductId(productId)
-            .orElseThrow(() -> new ApiException("Inventory not found")));
+            .orElseThrow(
+                () -> new ApiException("Inventory not found", HttpStatus.NOT_FOUND)));
   }
 
   @PatchMapping("/{productId}/stock")
@@ -41,7 +43,8 @@ public class InventoryController {
     Inventory inventory =
         inventoryRepository
             .findByProductId(productId)
-            .orElseThrow(() -> new ApiException("Inventory not found for product"));
+            .orElseThrow(
+                () -> new ApiException("Inventory not found for product", HttpStatus.NOT_FOUND));
 
     inventory.addStock(request.quantity());
 
@@ -54,7 +57,8 @@ public class InventoryController {
     Inventory inventory =
         inventoryRepository
             .findByProductId(productId)
-            .orElseThrow(() -> new ApiException("Inventory not found for product"));
+            .orElseThrow(
+                () -> new ApiException("Inventory not found for product", HttpStatus.NOT_FOUND));
 
     inventory.setQuantity(request.quantity());
 

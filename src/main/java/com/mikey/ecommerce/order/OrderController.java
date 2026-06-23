@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +55,7 @@ public class OrderController {
   @GetMapping("/my-orders")
   public List<OrderResponse> findMyOrders(Authentication authentication) {
     if (authentication == null || authentication.getName() == null) {
-      throw new ApiException("Authenticated user not found");
+      throw new ApiException("Authenticated user not found", HttpStatus.UNAUTHORIZED);
     }
 
     return orderRepository.findByCustomerEmailWithItems(authentication.getName()).stream()
@@ -83,10 +84,10 @@ public class OrderController {
     CustomerOrder order =
         orderRepository
             .findByIdWithItems(id)
-            .orElseThrow(() -> new ApiException("Order not found"));
+            .orElseThrow(() -> new ApiException("Order not found", HttpStatus.NOT_FOUND));
 
     if (!isAdmin(authentication) && !belongsToAuthenticatedUser(order, authentication)) {
-      throw new ApiException("Order not found");
+      throw new ApiException("Order not found", HttpStatus.NOT_FOUND);
     }
 
     return OrderMapper.toResponse(order);

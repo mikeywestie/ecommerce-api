@@ -4,6 +4,7 @@ import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.coupon.dto.CouponResponse;
 import com.mikey.ecommerce.coupon.dto.CreateCouponRequest;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +21,7 @@ public class CouponService {
 
   public CouponResponse create(CreateCouponRequest request) {
     if (couponRepository.existsByCodeIgnoreCase(request.code())) {
-      throw new ApiException("Coupon code already exists");
+      throw new ApiException("Coupon code already exists", HttpStatus.CONFLICT);
     }
 
     boolean reusable = request.reusable() == null || request.reusable();

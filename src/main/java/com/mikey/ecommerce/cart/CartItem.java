@@ -5,6 +5,7 @@ import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.product.Product;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import org.springframework.http.HttpStatus;
 
 @Entity
 @Table(name = "cart_items")
@@ -30,7 +31,7 @@ public class CartItem {
 
   public CartItem(Cart cart, Product product, int quantity) {
     if (quantity <= 0) {
-      throw new ApiException("Quantity must be greater than zero");
+      throw new ApiException("Quantity must be greater than zero", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     this.cart = cart;
@@ -60,7 +61,7 @@ public class CartItem {
 
   public void updateQuantity(int quantity) {
     if (quantity <= 0) {
-      throw new ApiException("Quantity must be greater than zero");
+      throw new ApiException("Quantity must be greater than zero", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     this.quantity = quantity;

@@ -7,6 +7,7 @@ import com.mikey.ecommerce.inventory.InventoryRepository;
 import com.mikey.ecommerce.product.Product;
 import com.mikey.ecommerce.product.ProductRepository;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,12 +40,18 @@ public class OrderService {
       Product product =
           productRepository
               .findById(itemRequest.productId())
-              .orElseThrow(() -> new ApiException("Product not found: " + itemRequest.productId()));
+              .orElseThrow(
+                  () ->
+                      new ApiException(
+                          "Product not found: " + itemRequest.productId(), HttpStatus.NOT_FOUND));
 
       inventoryRepository
           .findByProductId(product.getId())
           .orElseThrow(
-              () -> new ApiException("Inventory not found for product: " + product.getName()));
+              () ->
+                  new ApiException(
+                      "Inventory not found for product: " + product.getName(),
+                      HttpStatus.NOT_FOUND));
 
       OrderItem item = new OrderItem(order, product, itemRequest.quantity(), product.getPrice());
 

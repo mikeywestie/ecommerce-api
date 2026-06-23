@@ -4,6 +4,7 @@ import com.mikey.ecommerce.common.ApiException;
 import com.mikey.ecommerce.security.dto.AuthResponse;
 import com.mikey.ecommerce.security.dto.LoginRequest;
 import com.mikey.ecommerce.security.dto.RegisterRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +24,13 @@ public class AuthService {
 
   public AuthResponse register(RegisterRequest request) {
     if (appUserRepository.existsByEmail(request.email())) {
-      throw new ApiException("Email already registered");
+      throw new ApiException("Email already registered", HttpStatus.CONFLICT);
     }
 
     Role requestedRole = request.role() == null ? Role.CUSTOMER : request.role();
 
     if (requestedRole == Role.ADMIN && appUserRepository.existsByRole(Role.ADMIN)) {
-      throw new ApiException("Only an admin can register another admin");
+      throw new ApiException("Only an admin can register another admin", HttpStatus.FORBIDDEN);
     }
 
     AppUser user =
@@ -49,10 +50,11 @@ public class AuthService {
     AppUser user =
         appUserRepository
             .findByEmail(request.email())
-            .orElseThrow(() -> new ApiException("Invalid email or password"));
+            .orElseThrow(
+                () -> new ApiException("Invalid email or password", HttpStatus.UNAUTHORIZED));
 
     if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-      throw new ApiException("Invalid email or password");
+      throw new ApiException("Invalid email or password", HttpStatus.UNAUTHORIZED);
     }
 
     String token = jwtService.generateToken(user);
@@ -62,7 +64,7 @@ public class AuthService {
 
   public AuthResponse registerAdmin(RegisterRequest request) {
     if (appUserRepository.existsByEmail(request.email())) {
-      throw new ApiException("Email already registered");
+      throw new ApiException("Email already registered", HttpStatus.CONFLICT);
     }
 
     AppUser user =

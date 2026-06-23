@@ -27,6 +27,7 @@ import com.mikey.ecommerce.security.AppUserRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,10 +81,10 @@ public class CartService {
     Product product =
         productRepository
             .findById(request.productId())
-            .orElseThrow(() -> new ApiException("Product not found"));
+            .orElseThrow(() -> new ApiException("Product not found", HttpStatus.NOT_FOUND));
 
     if (!product.isActive()) {
-      throw new ApiException("Product is inactive");
+      throw new ApiException("Product is inactive", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     Cart cart = getOrCreateCart(user);
@@ -128,10 +129,12 @@ public class CartService {
     AppUser user = findUser(userEmail);
 
     Cart cart =
-        cartRepository.findByUser(user).orElseThrow(() -> new ApiException("Cart not found"));
+        cartRepository
+            .findByUser(user)
+            .orElseThrow(() -> new ApiException("Cart not found", HttpStatus.NOT_FOUND));
 
     if (cart.getItems().isEmpty()) {
-      throw new ApiException("Cart is empty");
+      throw new ApiException("Cart is empty", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     validateCartStock(cart);
@@ -187,7 +190,7 @@ public class CartService {
     Coupon coupon =
         couponRepository
             .findByCodeIgnoreCase(code)
-            .orElseThrow(() -> new ApiException("Coupon not found"));
+            .orElseThrow(() -> new ApiException("Coupon not found", HttpStatus.NOT_FOUND));
 
     validateCouponAvailability(coupon);
     validateCouponUsage(coupon, user);
@@ -218,11 +221,11 @@ public class CartService {
 
   private void validateCouponAvailability(Coupon coupon) {
     if (!coupon.isActive()) {
-      throw new ApiException("Coupon inactive");
+      throw new ApiException("Coupon inactive", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     if (coupon.isExpired()) {
-      throw new ApiException("Coupon expired");
+      throw new ApiException("Coupon expired", HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }
 
@@ -236,17 +239,17 @@ public class CartService {
     long totalUses = couponRedemptionRepository.countByCoupon(coupon);
 
     if (coupon.getMaxTotalUses() != null && totalUses >= coupon.getMaxTotalUses()) {
-      throw new ApiException("Coupon total usage limit reached");
+      throw new ApiException("Coupon total usage limit reached", HttpStatus.CONFLICT);
     }
 
     long customerUses = couponRedemptionRepository.countByCouponAndUser(coupon, user);
 
     if (!coupon.isReusable() && customerUses > 0) {
-      throw new ApiException("Coupon already used by this customer");
+      throw new ApiException("Coupon already used by this customer", HttpStatus.CONFLICT);
     }
 
     if (coupon.getMaxUsesPerCustomer() != null && customerUses >= coupon.getMaxUsesPerCustomer()) {
-      throw new ApiException("Coupon usage limit reached for this customer");
+      throw new ApiException("Coupon usage limit reached for this customer", HttpStatus.CONFLICT);
     }
   }
 
@@ -258,22 +261,24 @@ public class CartService {
               .orElseThrow(
                   () ->
                       new ApiException(
-                          "Inventory not found for product: " + item.getProduct().getName()));
+                          "Inventory not found for product: " + item.getProduct().getName(),
+                          HttpStatus.NOT_FOUND));
 
       if (!item.getProduct().isActive()) {
-        throw new ApiException(item.getProduct().getName() + " is no longer available");
+        throw new ApiException(
+            item.getProduct().getName() + " is no longer available",
+            HttpStatus.UNPROCESSABLE_ENTITY);
       }
 
       if (inventory.getQuantityAvailable() <= 0) {
-        throw new ApiException(item.getProduct().getName() + " is out of stock");
+        throw new ApiException(
+            item.getProduct().getName() + " is out of stock", HttpStatus.UNPROCESSABLE_ENTITY);
       }
 
       if (inventory.getQuantityAvailable() < item.getQuantity()) {
         throw new ApiException(
-            "Only "
-                + inventory.getQuantityAvailable()
-                + " left for "
-                + item.getProduct().getName());
+            "Only " + inventory.getQuantityAvailable() + " left for " + item.getProduct().getName(),
+            HttpStatus.UNPROCESSABLE_ENTITY);
       }
     }
   }
@@ -281,7 +286,7 @@ public class CartService {
   private AppUser findUser(String email) {
     return appUserRepository
         .findByEmail(email)
-        .orElseThrow(() -> new ApiException("User not found"));
+        .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
   }
 
   private Cart getOrCreateCart(AppUser user) {
@@ -289,14 +294,16 @@ public class CartService {
   }
 
   private Cart getExistingCart(AppUser user) {
-    return cartRepository.findByUser(user).orElseThrow(() -> new ApiException("Cart not found"));
+    return cartRepository
+        .findByUser(user)
+        .orElseThrow(() -> new ApiException("Cart not found", HttpStatus.NOT_FOUND));
   }
 
   private CartItem findCartItem(Cart cart, Long cartItemId) {
     return cart.getItems().stream()
         .filter(item -> item.getId().equals(cartItemId))
         .findFirst()
-        .orElseThrow(() -> new ApiException("Cart item not found"));
+        .orElseThrow(() -> new ApiException("Cart item not found", HttpStatus.NOT_FOUND));
   }
 
   private CartResponse toResponse(Cart cart) {
